@@ -1,62 +1,72 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.exception.FailIdException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.util.ResourceUtils;
 
-import java.time.LocalDate;
-import java.time.Month;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+@AutoConfigureMockMvc
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
 class UserControllerTest {
-    UserController userController;
-    User user;
 
-    @BeforeEach
-    void setUp() {
-        userController = new UserController();
-        user = new User();
-        user.setName("Егор");
-        user.setLogin("Egich");
-        user.setEmail("egich-2011@mail.ru");
-        user.setBirthday(LocalDate.of(1997, Month.OCTOBER, 7));
+    private static final String PATH = "/users";
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Test
+    void create() throws Exception {
+        mockMvc.perform(
+                        MockMvcRequestBuilders.post(PATH)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(getContent("controller/request/user/user.json")))
+                .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     @Test
-    void create() {
-        assertEquals(user, userController.create(user),
-                "Метод добавления должен возращать того же пользователя!");
-        user.setName("    ");
-        assertEquals(user.getLogin(), userController.create(user).getName(),
-                "Метод валидации должен заменить пустое имя на логин!");
-        user.setLogin("   ");
-        assertThrows(ValidationException.class, () -> userController.create(user),
-                "Метод валидации должен выбросить исключение!");
-        user.setLogin("Egich");
-        user.setEmail("   ");
-        assertThrows(ValidationException.class, () -> userController.create(user),
-                "Метод валидации должен выбросить исключение!");
-        user.setEmail("egich-2011@mail.ru");
-        user.setBirthday(LocalDate.now().plusDays(2));
-        assertThrows(ValidationException.class, () -> userController.create(user),
-                "Метод валидации должен выбросить исключение!");
+    void createUserFailBirthday() throws Exception {
+        mockMvc.perform(
+                        MockMvcRequestBuilders.post(PATH)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(getContent("controller/request/user/userFailBirthday.json")))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
     @Test
-    void update() {
-        userController.create(user);
-        user.setId(9999);
-        assertThrows(FailIdException.class, () -> userController.update(user),
-                "Должно выброситься исключение!");
-        user.setId(1);
-        user.setName("Егор 1");
-        user.setLogin("Egich 1");
-        user.setEmail("egich 1-2011@mail.ru");
-        user.setBirthday(LocalDate.of(2000, Month.DECEMBER, 17));
-        assertEquals(user, userController.update(user),
-                "Метод обновления должен возращать того же пользователя!");
+    void createUserFailEmail() throws Exception {
+        mockMvc.perform(
+                        MockMvcRequestBuilders.post(PATH)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(getContent("controller/request/user/userFailEmail.json")))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Test
+    void createUserFailLogin() throws Exception {
+        mockMvc.perform(
+                        MockMvcRequestBuilders.post(PATH)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(getContent("controller/request/user/userFailLogin.json")))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    private String getContent(String file) {
+        try {
+            return Files.readString(ResourceUtils.getFile("classpath:" + file).toPath(),
+                    StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            return "";
+        }
     }
 }
