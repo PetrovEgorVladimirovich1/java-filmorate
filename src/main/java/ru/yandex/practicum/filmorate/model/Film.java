@@ -16,7 +16,6 @@ public class Film {
 
     private long id;
 
-    @NotNull
     @NotBlank
     private String name;
 
@@ -31,12 +30,4 @@ public class Film {
     private int duration;
 
     private final Set<Long> likes = new HashSet<>();
-
-    public void addLike(long idUser) {
-        likes.add(idUser);
-    }
-
-    public void deleteLike(long idUser) {
-        likes.remove(idUser);
-    }
 }

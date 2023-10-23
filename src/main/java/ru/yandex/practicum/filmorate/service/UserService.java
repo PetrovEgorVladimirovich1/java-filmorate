@@ -4,13 +4,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
-import ru.yandex.practicum.filmorate.exception.FailIdException;
+import ru.yandex.practicum.filmorate.exception.IncorrectParamException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.validate.Validate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -51,30 +52,30 @@ public class UserService {
 
     public User getByIdUser(long id) {
         if (userStorage.getByIdUser(id) == null) {
-            throw new FailIdException("Неверный id!");
+            throw new IncorrectParamException("Неверный id!");
         }
         return userStorage.getByIdUser(id);
     }
 
     public void addFriend(long idUser, long idFriend) {
         if (userStorage.getByIdUser(idUser) == null || userStorage.getByIdUser(idFriend) == null) {
-            throw new FailIdException("Неверный id!");
+            throw new IncorrectParamException("Неверный id!");
         }
-        userStorage.getByIdUser(idUser).addFriend(idFriend);
-        userStorage.getByIdUser(idFriend).addFriend(idUser);
+        userStorage.getByIdUser(idUser).getFriends().add(idFriend);
+        userStorage.getByIdUser(idFriend).getFriends().add(idUser);
     }
 
     public void deleteFriend(long idUser, long idFriend) {
         if (userStorage.getByIdUser(idUser) == null || userStorage.getByIdUser(idFriend) == null) {
-            throw new FailIdException("Неверный id!");
+            throw new IncorrectParamException("Неверный id!");
         }
-        userStorage.getByIdUser(idUser).deleteFriend(idFriend);
-        userStorage.getByIdUser(idFriend).deleteFriend(idUser);
+        userStorage.getByIdUser(idUser).getFriends().remove(idFriend);
+        userStorage.getByIdUser(idFriend).getFriends().remove(idUser);
     }
 
     public List<User> getUserFriends(long id) {
         if (userStorage.getByIdUser(id) == null) {
-            throw new FailIdException("Неверный id!");
+            throw new IncorrectParamException("Неверный id!");
         }
         List<User> friends = new ArrayList<>();
         for (long idFriend : userStorage.getByIdUser(id).getFriends()) {
@@ -85,14 +86,13 @@ public class UserService {
 
     public List<User> getUserFriendsCommonWithOtherUser(long idUser, long idOtherUser) {
         if (userStorage.getByIdUser(idUser) == null || userStorage.getByIdUser(idOtherUser) == null) {
-            throw new FailIdException("Неверный id!");
+            throw new IncorrectParamException("Неверный id!");
         }
-        List<User> friendsCommon = new ArrayList<>();
-        for (long id : userStorage.getByIdUser(idUser).getFriends()) {
-            if (userStorage.getByIdUser(idOtherUser).getFriends().contains(id)) {
-                friendsCommon.add(userStorage.getByIdUser(id));
-            }
-        }
-        return friendsCommon;
+        List<Long> friendsUser = new ArrayList<>(userStorage.getByIdUser(idUser).getFriends());
+        List<Long> friendsOtherUser = new ArrayList<>(userStorage.getByIdUser(idOtherUser).getFriends());
+        friendsUser.retainAll(friendsOtherUser);
+        return friendsUser.stream()
+                .map(userStorage::getByIdUser)
+                .collect(Collectors.toList());
     }
 }

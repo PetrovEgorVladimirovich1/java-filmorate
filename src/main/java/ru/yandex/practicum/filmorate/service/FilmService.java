@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
-import ru.yandex.practicum.filmorate.exception.FailIdException;
+import ru.yandex.practicum.filmorate.exception.IncorrectParamException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -47,24 +47,24 @@ public class FilmService {
 
     public Film getByIdFilm(long id) {
         if (filmStorage.getByIdFilm(id) == null) {
-            throw new FailIdException("Неверный id!");
+            throw new IncorrectParamException("Неверный id!");
         }
         return filmStorage.getByIdFilm(id);
     }
 
     public void addLike(long idFilm, long idUser) {
         if (filmStorage.getByIdFilm(idFilm) == null || userStorage.getByIdUser(idUser) == null) {
-            throw new FailIdException("Неверный id!");
+            throw new IncorrectParamException("Неверный id!");
         }
-        filmStorage.getByIdFilm(idFilm).addLike(idUser);
+        filmStorage.getByIdFilm(idFilm).getLikes().add(idUser);
         log.info("Добавлен лайк.");
     }
 
     public void deleteLike(long idFilm, long idUser) {
         if (filmStorage.getByIdFilm(idFilm) == null || userStorage.getByIdUser(idUser) == null) {
-            throw new FailIdException("Неверный id!");
+            throw new IncorrectParamException("Неверный id!");
         }
-        filmStorage.getByIdFilm(idFilm).deleteLike(idUser);
+        filmStorage.getByIdFilm(idFilm).getLikes().remove(idUser);
         log.info("Лайк удалён.");
     }
 
