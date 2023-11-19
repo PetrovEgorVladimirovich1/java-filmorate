@@ -1,9 +1,9 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.storage.memory;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.IncorrectParamException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.dal.UserStorage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-@Slf4j
 public class InMemoryUserStorage implements UserStorage {
     private final Map<Long, User> users = new HashMap<>();
 
@@ -43,5 +42,25 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User getByIdUser(long id) {
         return users.getOrDefault(id, null);
+    }
+
+    @Override
+    public void addFriend(long idUser, long idFriend) {
+
+    }
+
+    @Override
+    public void deleteFriend(long idUser, long idFriend) {
+
+    }
+
+    @Override
+    public List<User> getUserFriends(long id) {
+        return null;
+    }
+
+    @Override
+    public List<User> getUserFriendsCommonWithOtherUser(long idUser, long idOtherUser) {
+        return null;
     }
 }

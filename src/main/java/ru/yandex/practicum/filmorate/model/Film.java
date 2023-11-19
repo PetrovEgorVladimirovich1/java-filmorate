@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.experimental.SuperBuilder;
 import ru.yandex.practicum.filmorate.annotations.IsBeforeBirthdayMovie;
 
 import javax.validation.constraints.Min;
@@ -12,6 +14,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
+@AllArgsConstructor
+@SuperBuilder
 public class Film {
 
     private long id;
@@ -28,6 +32,10 @@ public class Film {
 
     @Min(value = 1)
     private int duration;
+
+    private Mpa mpa;
+
+    private final Set<Genre> genres = new HashSet<>();
 
     private final Set<Long> likes = new HashSet<>();
 }
