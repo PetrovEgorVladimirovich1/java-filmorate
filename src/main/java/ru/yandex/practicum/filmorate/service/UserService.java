@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
-import ru.yandex.practicum.filmorate.exception.IncorrectParamException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.dal.UserStorage;
 import ru.yandex.practicum.filmorate.validate.Validate;
@@ -50,9 +49,6 @@ public class UserService {
     }
 
     public User getByIdUser(long id) {
-        if (userStorage.getByIdUser(id) == null) {
-            throw new IncorrectParamException("Неверный id!");
-        }
         return userStorage.getByIdUser(id);
     }
 

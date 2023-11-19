@@ -111,5 +111,6 @@ class FilmDbStorageTest {
         filmDbStorage.addLike(film.getId(), userTest.getId());
         filmDbStorage.addLike(film.getId(), userTest1.getId());
         filmDbStorage.addLike(filmTest.getId(), userTest.getId());
-        assertEquals(2, filmDbStorage.getPopularFilms(5).size());    }
+        assertEquals(2, filmDbStorage.getPopularFilms(5).size());
+    }
 }
