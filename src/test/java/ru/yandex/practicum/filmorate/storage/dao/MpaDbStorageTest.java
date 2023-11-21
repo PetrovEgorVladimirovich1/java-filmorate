@@ -1,27 +1,24 @@
 package ru.yandex.practicum.filmorate.storage.dao;
 
-import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@JdbcTest
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@SpringBootTest
+@AutoConfigureTestDatabase
 class MpaDbStorageTest {
-    private final JdbcTemplate jdbcTemplate;
-
     private MpaDbStorage mpaDbStorage;
 
     @BeforeEach
-    void setUp() {
-        mpaDbStorage = new MpaDbStorage(jdbcTemplate);
+    void setUp(@Autowired MpaDbStorage mpaDbStorage) {
+        this.mpaDbStorage = mpaDbStorage;
     }
 
     @Test

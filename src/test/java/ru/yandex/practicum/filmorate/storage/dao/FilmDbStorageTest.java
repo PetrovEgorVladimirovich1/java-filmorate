@@ -1,11 +1,10 @@
 package ru.yandex.practicum.filmorate.storage.dao;
 
-import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -17,25 +16,23 @@ import java.time.Month;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@JdbcTest
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@SpringBootTest
+@AutoConfigureTestDatabase
 class FilmDbStorageTest {
-
-    private final JdbcTemplate jdbcTemplate;
-
     private FilmDbStorage filmDbStorage;
+    private UserDbStorage userDbStorage;
 
     private Film film;
 
     private Film filmTest;
 
     @BeforeEach
-    void setUp() {
-        filmDbStorage = new FilmDbStorage(jdbcTemplate);
+    void setUp(@Autowired FilmDbStorage filmDbStorage) {
+        this.filmDbStorage = filmDbStorage;
         film = new Film(1L, "Крепкий орешек.", "Описание.",
                 LocalDate.of(1988, Month.JULY, 12), 133, new Mpa(4, "R"));
-        filmDbStorage.create(film);
+        this.filmDbStorage.create(film);
     }
 
     @Test
@@ -72,24 +69,24 @@ class FilmDbStorageTest {
     }
 
     @Test
-    void addLike() {
-        UserDbStorage userDbStorage = new UserDbStorage(jdbcTemplate);
+    void addLike(@Autowired UserDbStorage userDbStorage) {
+        this.userDbStorage = userDbStorage;
         User userTest = new User(2L, "egich-2011@mail.ru", "Egor", "Egor Petrov",
                 LocalDate.of(2000, 9, 19));
-        userDbStorage.create(userTest);
+        this.userDbStorage.create(userTest);
         filmDbStorage.addLike(film.getId(), userTest.getId());
         assertEquals(1, filmDbStorage.getPopularFilms(5).size());
     }
 
     @Test
-    void deleteLike() {
-        UserDbStorage userDbStorage = new UserDbStorage(jdbcTemplate);
+    void deleteLike(@Autowired UserDbStorage userDbStorage) {
+        this.userDbStorage = userDbStorage;
         User userTest = new User(2L, "egich-2011@mail.ru", "Egor", "Egor Petrov",
                 LocalDate.of(2000, 9, 19));
         User userTest1 = new User(3L, "egich-2011@mail.ru", "Egor", "Egor Petrov",
                 LocalDate.of(2000, 9, 19));
-        userDbStorage.create(userTest);
-        userDbStorage.create(userTest1);
+        this.userDbStorage.create(userTest);
+        this.userDbStorage.create(userTest1);
         filmDbStorage.addLike(film.getId(), userTest.getId());
         filmDbStorage.addLike(film.getId(), userTest1.getId());
         filmDbStorage.deleteLike(film.getId(), userTest.getId());
@@ -97,17 +94,17 @@ class FilmDbStorageTest {
     }
 
     @Test
-    void getPopularFilms() {
+    void getPopularFilms(@Autowired UserDbStorage userDbStorage) {
         filmTest = new Film(2L, "Крепкий орешек 2.", "Описание.",
                 LocalDate.of(1990, Month.JULY, 2), 124, new Mpa(4, "R"));
         filmDbStorage.create(filmTest);
-        UserDbStorage userDbStorage = new UserDbStorage(jdbcTemplate);
+        this.userDbStorage = userDbStorage;
         User userTest = new User(2L, "egich-2011@mail.ru", "Egor", "Egor Petrov",
                 LocalDate.of(2000, 9, 19));
         User userTest1 = new User(3L, "egich-2011@mail.ru", "Egor", "Egor Petrov",
                 LocalDate.of(2000, 9, 19));
-        userDbStorage.create(userTest);
-        userDbStorage.create(userTest1);
+        this.userDbStorage.create(userTest);
+        this.userDbStorage.create(userTest1);
         filmDbStorage.addLike(film.getId(), userTest.getId());
         filmDbStorage.addLike(film.getId(), userTest1.getId());
         filmDbStorage.addLike(filmTest.getId(), userTest.getId());

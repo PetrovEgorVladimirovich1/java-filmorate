@@ -1,11 +1,10 @@
 package ru.yandex.practicum.filmorate.storage.dao;
 
-import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -14,13 +13,10 @@ import java.time.LocalDate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@JdbcTest
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@SpringBootTest
+@AutoConfigureTestDatabase
 class UserDbStorageTest {
-
-    private final JdbcTemplate jdbcTemplate;
-
     private UserDbStorage userStorage;
 
     private User user;
@@ -28,11 +24,11 @@ class UserDbStorageTest {
     private User userTest;
 
     @BeforeEach
-    void setUp() {
-        userStorage = new UserDbStorage(jdbcTemplate);
+    void setUp(@Autowired UserDbStorage userStorage) {
+        this.userStorage = userStorage;
         user = new User(1L, "user@email.ru", "vanya123", "Ivan Petrov",
                 LocalDate.of(1990, 1, 1));
-        userStorage.create(user);
+        this.userStorage.create(user);
     }
 
     @Test

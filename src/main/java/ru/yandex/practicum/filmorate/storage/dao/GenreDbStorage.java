@@ -30,7 +30,7 @@ public class GenreDbStorage implements GenreStorage {
     public Genre getByIdGenre(long id) {
         String sql = "SELECT * FROM genres WHERE id = ?";
         List<Genre> genres = jdbcTemplate.query(sql, (rs, rowNum) -> makeGenre(rs), id);
-        if (genres.size() != 1) {
+        if (genres.isEmpty()) {
             throw new IncorrectParamException("Неверный id!");
         }
         return genres.get(0);

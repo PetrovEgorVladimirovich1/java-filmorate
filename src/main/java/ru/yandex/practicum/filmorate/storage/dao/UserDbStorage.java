@@ -2,18 +2,22 @@ package ru.yandex.practicum.filmorate.storage.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.IncorrectParamException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.dal.UserStorage;
 
+import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 
 @Component
 public class UserDbStorage implements UserStorage {
-    private long id = 0;
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -22,20 +26,21 @@ public class UserDbStorage implements UserStorage {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    private long addId() {
-        return ++id;
-    }
 
     @Override
     public void create(User user) {
         String sql = "INSERT INTO users (email, login, name, birthday) " +
                 "VALUES (?, ?, ?, ?)";
-        jdbcTemplate.update(sql,
-                user.getEmail(),
-                user.getLogin(),
-                user.getName(),
-                user.getBirthday());
-        user.setId(addId());
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement stmt = connection.prepareStatement(sql, new String[]{"id"});
+            stmt.setString(1, user.getEmail());
+            stmt.setString(2, user.getLogin());
+            stmt.setString(3, user.getName());
+            stmt.setDate(4, Date.valueOf(user.getBirthday()));
+            return stmt;
+        }, keyHolder);
+        user.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
     }
 
     @Override
@@ -64,7 +69,7 @@ public class UserDbStorage implements UserStorage {
     public User getByIdUser(long id) {
         String sql = "SELECT * FROM users WHERE id = ?";
         List<User> users = jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs), id);
-        if (users.size() != 1) {
+        if (users.isEmpty()) {
             throw new IncorrectParamException("Неверный id!");
         }
         return users.get(0);

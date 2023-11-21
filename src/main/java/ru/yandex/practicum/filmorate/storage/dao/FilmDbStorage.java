@@ -2,6 +2,8 @@ package ru.yandex.practicum.filmorate.storage.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.IncorrectParamException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -9,17 +11,15 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.dal.FilmStorage;
 
+import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
 public class FilmDbStorage implements FilmStorage {
-    private long id = 0;
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -28,23 +28,23 @@ public class FilmDbStorage implements FilmStorage {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    private long addId() {
-        return ++id;
-    }
-
     @Override
     public void create(Film film) {
         String sql = "INSERT INTO films (name, description, release_date, duration, mpa_id) " +
                 "VALUES (?, ?, ?, ?, ?)";
         String sqlForFilmGenres = "INSERT INTO film_genres (film_id, genre_id) " +
                 "VALUES (?, ?)";
-        jdbcTemplate.update(sql,
-                film.getName(),
-                film.getDescription(),
-                film.getReleaseDate(),
-                film.getDuration(),
-                film.getMpa().getId());
-        film.setId(addId());
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement stmt = connection.prepareStatement(sql, new String[]{"id"});
+            stmt.setString(1, film.getName());
+            stmt.setString(2, film.getDescription());
+            stmt.setDate(3, Date.valueOf(film.getReleaseDate()));
+            stmt.setInt(4, film.getDuration());
+            stmt.setLong(5, film.getMpa().getId());
+            return stmt;
+        }, keyHolder);
+        film.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
         for (Genre genre : film.getGenres()) {
             jdbcTemplate.update(sqlForFilmGenres,
                     film.getId(),
@@ -105,7 +105,7 @@ public class FilmDbStorage implements FilmStorage {
                 "LEFT JOIN mpa AS m ON f.mpa_id = m.id " +
                 "WHERE f.id = ?";
         List<Film> films = jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs), id);
-        if (films.size() != 1) {
+        if (films.isEmpty()) {
             throw new IncorrectParamException("Неверный id!");
         }
         return films.get(0);

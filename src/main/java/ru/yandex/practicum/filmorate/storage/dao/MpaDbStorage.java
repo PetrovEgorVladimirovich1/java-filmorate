@@ -30,7 +30,7 @@ public class MpaDbStorage implements MpaStorage {
     public Mpa getByIdMpa(long id) {
         String sql = "SELECT * FROM mpa WHERE id = ?";
         List<Mpa> mpa = jdbcTemplate.query(sql, (rs, rowNum) -> makeMpa(rs), id);
-        if (mpa.size() != 1) {
+        if (mpa.isEmpty()) {
             throw new IncorrectParamException("Неверный id!");
         }
         return mpa.get(0);
