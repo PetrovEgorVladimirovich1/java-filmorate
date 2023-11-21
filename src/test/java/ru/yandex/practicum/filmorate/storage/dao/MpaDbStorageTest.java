@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.dao;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -14,12 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 @AutoConfigureTestDatabase
 class MpaDbStorageTest {
+    @Autowired
     private MpaDbStorage mpaDbStorage;
-
-    @BeforeEach
-    void setUp(@Autowired MpaDbStorage mpaDbStorage) {
-        this.mpaDbStorage = mpaDbStorage;
-    }
 
     @Test
     void getMpa() {

@@ -17,11 +17,11 @@ CREATE TABLE IF NOT EXISTS films (
     description varchar(200),
     release_date date NOT NULL,
     duration integer,
-    mpa_id integer REFERENCES mpa (id));
+    mpa_id BIGINT REFERENCES mpa (id));
 
 CREATE TABLE IF NOT EXISTS likes (
-    film_id integer NOT NULL REFERENCES films (id),
-    user_id integer NOT NULL REFERENCES users (id),
+    film_id BIGINT NOT NULL REFERENCES films (id),
+    user_id BIGINT NOT NULL REFERENCES users (id),
     PRIMARY KEY (film_id, user_id));
 
 CREATE TABLE IF NOT EXISTS genres (
@@ -29,11 +29,11 @@ CREATE TABLE IF NOT EXISTS genres (
     name varchar(50));
 
 CREATE TABLE IF NOT EXISTS film_genres (
-    film_id integer REFERENCES films (id),
-    genre_id integer REFERENCES genres (id),
+    film_id BIGINT REFERENCES films (id),
+    genre_id BIGINT REFERENCES genres (id),
     PRIMARY KEY (film_id, genre_id));
 
 CREATE TABLE IF NOT EXISTS friends (
-    user_id integer NOT NULL REFERENCES users (id),
-    friend_id integer NOT NULL REFERENCES users (id),
+    user_id BIGINT NOT NULL REFERENCES users (id),
+    friend_id BIGINT NOT NULL REFERENCES users (id),
     PRIMARY KEY (user_id, friend_id));

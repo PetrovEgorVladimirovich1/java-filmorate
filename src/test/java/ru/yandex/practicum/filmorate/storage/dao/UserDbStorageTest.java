@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 @AutoConfigureTestDatabase
 class UserDbStorageTest {
+    @Autowired
     private UserDbStorage userStorage;
 
     private User user;
@@ -24,11 +25,10 @@ class UserDbStorageTest {
     private User userTest;
 
     @BeforeEach
-    void setUp(@Autowired UserDbStorage userStorage) {
-        this.userStorage = userStorage;
+    void setUp() {
         user = new User(1L, "user@email.ru", "vanya123", "Ivan Petrov",
                 LocalDate.of(1990, 1, 1));
-        this.userStorage.create(user);
+        userStorage.create(user);
     }
 
     @Test

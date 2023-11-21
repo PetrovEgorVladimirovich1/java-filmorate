@@ -20,7 +20,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 @AutoConfigureTestDatabase
 class FilmDbStorageTest {
+    @Autowired
     private FilmDbStorage filmDbStorage;
+    @Autowired
     private UserDbStorage userDbStorage;
 
     private Film film;
@@ -28,11 +30,10 @@ class FilmDbStorageTest {
     private Film filmTest;
 
     @BeforeEach
-    void setUp(@Autowired FilmDbStorage filmDbStorage) {
-        this.filmDbStorage = filmDbStorage;
+    void setUp() {
         film = new Film(1L, "Крепкий орешек.", "Описание.",
                 LocalDate.of(1988, Month.JULY, 12), 133, new Mpa(4, "R"));
-        this.filmDbStorage.create(film);
+        filmDbStorage.create(film);
     }
 
     @Test
@@ -69,24 +70,22 @@ class FilmDbStorageTest {
     }
 
     @Test
-    void addLike(@Autowired UserDbStorage userDbStorage) {
-        this.userDbStorage = userDbStorage;
+    void addLike() {
         User userTest = new User(2L, "egich-2011@mail.ru", "Egor", "Egor Petrov",
                 LocalDate.of(2000, 9, 19));
-        this.userDbStorage.create(userTest);
+        userDbStorage.create(userTest);
         filmDbStorage.addLike(film.getId(), userTest.getId());
         assertEquals(1, filmDbStorage.getPopularFilms(5).size());
     }
 
     @Test
-    void deleteLike(@Autowired UserDbStorage userDbStorage) {
-        this.userDbStorage = userDbStorage;
+    void deleteLike() {
         User userTest = new User(2L, "egich-2011@mail.ru", "Egor", "Egor Petrov",
                 LocalDate.of(2000, 9, 19));
         User userTest1 = new User(3L, "egich-2011@mail.ru", "Egor", "Egor Petrov",
                 LocalDate.of(2000, 9, 19));
-        this.userDbStorage.create(userTest);
-        this.userDbStorage.create(userTest1);
+        userDbStorage.create(userTest);
+        userDbStorage.create(userTest1);
         filmDbStorage.addLike(film.getId(), userTest.getId());
         filmDbStorage.addLike(film.getId(), userTest1.getId());
         filmDbStorage.deleteLike(film.getId(), userTest.getId());
@@ -94,17 +93,16 @@ class FilmDbStorageTest {
     }
 
     @Test
-    void getPopularFilms(@Autowired UserDbStorage userDbStorage) {
+    void getPopularFilms() {
         filmTest = new Film(2L, "Крепкий орешек 2.", "Описание.",
                 LocalDate.of(1990, Month.JULY, 2), 124, new Mpa(4, "R"));
         filmDbStorage.create(filmTest);
-        this.userDbStorage = userDbStorage;
         User userTest = new User(2L, "egich-2011@mail.ru", "Egor", "Egor Petrov",
                 LocalDate.of(2000, 9, 19));
         User userTest1 = new User(3L, "egich-2011@mail.ru", "Egor", "Egor Petrov",
                 LocalDate.of(2000, 9, 19));
-        this.userDbStorage.create(userTest);
-        this.userDbStorage.create(userTest1);
+        userDbStorage.create(userTest);
+        userDbStorage.create(userTest1);
         filmDbStorage.addLike(film.getId(), userTest.getId());
         filmDbStorage.addLike(film.getId(), userTest1.getId());
         filmDbStorage.addLike(filmTest.getId(), userTest.getId());
