@@ -18,4 +18,13 @@ public interface FilmStorage {
     void deleteLike(long idFilm, long idUser);
 
     List<Film> getPopularFilms(int count);
+
+    /**
+     * Метод возвращает список фильмов которые не лайкнул userId, но лайкнули юзеры с походим набором лайков
+     * валидность параметра не проверяется
+     *
+     * @param userId
+     * @return список объектов класса Film
+     */
+    List<Film> getUserRecommendations(Integer userId);
 }
