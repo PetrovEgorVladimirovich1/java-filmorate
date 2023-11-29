@@ -7,7 +7,7 @@ import java.util.List;
 public interface ReviewsStorage {
     Reviews create (Reviews reviews);
     Reviews update(Reviews reviews);
-    Reviews remove( Long id);
+    Integer remove(Long id);
     Reviews get(Long id);
     List<Reviews> getReviewsFilm(Long id, Long count);
     Reviews addLike(Long id, Long userId);

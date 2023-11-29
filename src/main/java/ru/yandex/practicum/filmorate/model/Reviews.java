@@ -8,10 +8,10 @@ import lombok.EqualsAndHashCode;
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Reviews {
-    private long reviewId;
+    private Long reviewId;
     private String content;
-    private boolean isPositive;
-    private long userId;
-    private long filmId;
-    private int useful;
+    private Integer isPositive;
+    private Long userId;
+    private Long filmId;
+    private Integer useful;
 }
