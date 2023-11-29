@@ -49,6 +49,6 @@ CREATE TABLE IF NOT EXISTS Reviews(
 
 CREATE TABLE IF NOT EXISTS useful(
      reviewId BIGINT REFERENCES Reviews (id),
-     userId BIGINT REFERENCES users (id),
+     userId BIGINT UNIQUE REFERENCES users (id),
      useFul INTEGER
 );

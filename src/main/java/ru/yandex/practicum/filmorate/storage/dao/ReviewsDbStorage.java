@@ -52,8 +52,10 @@ public class ReviewsDbStorage implements ReviewsStorage {
     }
 
     @Override
-    public Integer remove(Long id) {
-        return jdbcTemplate.update("DELETE FROM Reviews WHERE id = ?", id);
+    public Reviews remove(Long id) {
+        Reviews reviews = get(id);
+        jdbcTemplate.update("DELETE FROM Reviews WHERE id = ?", id);
+        return reviews;
     }
 
     @Override
