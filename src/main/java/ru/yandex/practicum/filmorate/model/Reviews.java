@@ -9,7 +9,9 @@ import javax.validation.constraints.Positive;
 @Data
 public class Reviews {
     private Long reviewId;
+    @NotNull
     private String content;
+    @NotNull
     private Boolean isPositive;
     @NotNull
     @Positive
