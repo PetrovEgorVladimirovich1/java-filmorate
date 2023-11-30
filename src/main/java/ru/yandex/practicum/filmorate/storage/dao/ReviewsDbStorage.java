@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Reviews;
@@ -23,7 +24,7 @@ public class ReviewsDbStorage implements ReviewsStorage {
 
     @Override
     public Reviews create(Reviews reviews) {
-        jdbcTemplate.update(
+         int id = jdbcTemplate.update(
                 "INSERT INTO Reviews (content, isPositive, userId, filmId, useFul) VALUES (?, ?, ?, ?, ?)",
                 reviews.getContent(),
                 reviews.getIsPositive(),
@@ -31,6 +32,7 @@ public class ReviewsDbStorage implements ReviewsStorage {
                 reviews.getFilmId(),
                 reviews.getUseful()
         );
+         reviews.setReviewId((long) id);
         return reviews;
     }
 
@@ -60,21 +62,26 @@ public class ReviewsDbStorage implements ReviewsStorage {
 
     @Override
     public Reviews get(Long id) {
-        return jdbcTemplate.queryForObject("SELECT * FROM Reviews WHERE id = ?", this::mapRow, id);
+        try {
+            return jdbcTemplate.queryForObject("SELECT * FROM Reviews WHERE id = ?", this::mapRow, id);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+
     }
 
     @Override
     public List<Reviews> getReviewsFilm(Long filmId, Long count) {
-        String sql = "SELECT * FROM Reviews "
-                + (filmId == null ? "" : "WHERE filmid = " + filmId)
-                + (count == null ? " LIMIT = 10" : " LIMIT = " + count + ";");
+        String sql = "SELECT * FROM Reviews"
+                + (filmId == null ? "" : " WHERE filmid = " + filmId)
+                + (count == null ? " LIMIT 10;" : " LIMIT " + count + ";");
         return this.jdbcTemplate.query(sql, this::mapRow);
     }
 
     @Override
     public Reviews addLike(Long id, Long userId) {
         this.jdbcTemplate.
-                update("INSERT INTO useful (reviewId, userId, useFul) VALUES (?, ?, ?)",
+                update("INSERT INTO useful(reviewId, userId, useFul) VALUES (?, ?, ?)",
                         id,
                         userId,
                         1);
@@ -110,12 +117,14 @@ public class ReviewsDbStorage implements ReviewsStorage {
         for (Integer a:useFul) {
             number += a;
         }
-        return new Reviews(
-                rs.getLong("id"),
-                rs.getString("contennt"),
+        Reviews reviews = new Reviews(
+                rs.getString("content"),
                 rs.getInt("ispositive"),
                 rs.getLong("userid"),
-                rs.getLong("filmid"),
-                number);
+                rs.getLong("filmid")
+                );
+        reviews.setUseful(number);
+        reviews.setReviewId(rs.getLong("id"));
+        return reviews;
     }
 }
