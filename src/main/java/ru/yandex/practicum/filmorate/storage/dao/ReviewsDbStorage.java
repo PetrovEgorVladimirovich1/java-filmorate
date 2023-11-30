@@ -3,6 +3,8 @@ package ru.yandex.practicum.filmorate.storage.dao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Reviews;
 import ru.yandex.practicum.filmorate.storage.dal.ReviewsStorage;
@@ -24,15 +26,16 @@ public class ReviewsDbStorage implements ReviewsStorage {
 
     @Override
     public Reviews create(Reviews reviews) {
-         int id = jdbcTemplate.update(
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+         jdbcTemplate.update(
                 "INSERT INTO Reviews (content, isPositive, userId, filmId, useFul) VALUES (?, ?, ?, ?, ?)",
                 reviews.getContent(),
                 reviews.getIsPositive() ? 1 : 0,
                 reviews.getUserId(),
                 reviews.getFilmId(),
-                reviews.getUseful()
+                reviews.getUseful(), keyHolder
         );
-         reviews.setReviewId((long) id);
+         reviews.setReviewId((long) keyHolder.getKey());
         return reviews;
     }
 
