@@ -99,4 +99,12 @@ public class ReviewsController {
         log.info("Отправлен ответ для DELETE запроса /{}/dislike/{}", id, userId);
         return response;
     }
+
+    @GetMapping
+    public List<Reviews> getAll() {
+        log.info("Пришел GET запрос /reviews}");
+        List<Reviews> response = reviewsService.getAll();
+        log.info("Отправлен ответ для GET запроса /reviews с телом: {}", response);
+        return response;
+    }
 }

@@ -63,4 +63,8 @@ public class ReviewsService {
     public Reviews removeDislike(Long id, Long userId) {
         return reviewsStorage.removeDislike(id, userId);
     }
+
+    public List<Reviews> getAll() {
+        return reviewsStorage.getAll();
+    }
 }

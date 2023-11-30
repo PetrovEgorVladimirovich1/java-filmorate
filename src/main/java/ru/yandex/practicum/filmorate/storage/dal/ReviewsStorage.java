@@ -14,4 +14,5 @@ public interface ReviewsStorage {
     Reviews addDislike(Long id, Long userId);
     Reviews removeLike(Long id, Long userId);
     Reviews removeDislike(Long id, Long userId);
+    List<Reviews> getAll();
 }

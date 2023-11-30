@@ -27,7 +27,7 @@ public class ReviewsDbStorage implements ReviewsStorage {
          int id = jdbcTemplate.update(
                 "INSERT INTO Reviews (content, isPositive, userId, filmId, useFul) VALUES (?, ?, ?, ?, ?)",
                 reviews.getContent(),
-                reviews.getIsPositive(),
+                reviews.getIsPositive() ? 1 : 0,
                 reviews.getUserId(),
                 reviews.getFilmId(),
                 reviews.getUseful()
@@ -56,18 +56,14 @@ public class ReviewsDbStorage implements ReviewsStorage {
     @Override
     public Reviews remove(Long id) {
         Reviews reviews = get(id);
+        jdbcTemplate.update("DELETE FROM useful WHERE reviewId = ?", id);
         jdbcTemplate.update("DELETE FROM Reviews WHERE id = ?", id);
         return reviews;
     }
 
     @Override
     public Reviews get(Long id) {
-        try {
             return jdbcTemplate.queryForObject("SELECT * FROM Reviews WHERE id = ?", this::mapRow, id);
-        } catch (EmptyResultDataAccessException e) {
-            return null;
-        }
-
     }
 
     @Override
@@ -110,6 +106,11 @@ public class ReviewsDbStorage implements ReviewsStorage {
         return get(id);
     }
 
+    @Override
+    public List<Reviews> getAll() {
+        return jdbcTemplate.query("SELECT * FROM Reviews", this::mapRow);
+    }
+
     private Reviews mapRow(ResultSet rs, int rowNum) throws SQLException {
         List<Integer> useFul = jdbcTemplate.query("SELECT useFul FROM useful WHERE reviewId = ?",
                 (o1, o2) -> o1.getInt("useful"), rs.getInt("id"));
@@ -119,7 +120,7 @@ public class ReviewsDbStorage implements ReviewsStorage {
         }
         Reviews reviews = new Reviews(
                 rs.getString("content"),
-                rs.getInt("ispositive"),
+                rs.getInt("ispositive") == 1,
                 rs.getLong("userid"),
                 rs.getLong("filmid")
                 );

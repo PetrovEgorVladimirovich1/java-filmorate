@@ -7,12 +7,12 @@ import lombok.Data;
 public class Reviews {
     private Long reviewId;
     private String content;
-    private Integer isPositive;
+    private Boolean isPositive;
     private Long userId;
     private Long filmId;
     private Integer useful = 0;
 
-    public Reviews(String content, Integer isPositive, Long userId, Long filmId) {
+    public Reviews(String content, Boolean isPositive, Long filmId, Long userId) {
         this.content = content;
         this.isPositive = isPositive;
         this.userId = userId;
