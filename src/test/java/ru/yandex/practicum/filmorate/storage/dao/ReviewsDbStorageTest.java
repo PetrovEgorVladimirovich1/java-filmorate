@@ -54,10 +54,11 @@ public class ReviewsDbStorageTest {
 
     @Test
     public void createAndGet() {
-        Reviews reviews = new Reviews("bbuij", true, user1.getId(), film.getId());
+        Reviews reviews = new Reviews("bbuij", true, user2.getId(), film1.getId());
         reviewsStorage.create(reviews);
         Reviews reviews1 = reviewsStorage.get(reviews.getReviewId());
         Assertions.assertEquals(reviews, reviews1);
+        System.out.println(reviews);
     }
 
 

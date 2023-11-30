@@ -44,7 +44,7 @@ public class ReviewsDbStorage implements ReviewsStorage {
         jdbcTemplate.update(
                 "UPDATE Reviews SET content = ?, isPositive = ?, userId = ?, filmId = ?, useFul = ? WHERE id = ?",
                 reviews.getContent(),
-                reviews.getIsPositive(),
+                reviews.getIsPositive() ? 1 : 0,
                 reviews.getUserId(),
                 reviews.getFilmId(),
                 reviews.getUseful(),
