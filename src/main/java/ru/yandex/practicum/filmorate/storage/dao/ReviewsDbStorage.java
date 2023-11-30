@@ -42,11 +42,9 @@ public class ReviewsDbStorage implements ReviewsStorage {
             throw new ValidationException("Not found key: " + reviews.getReviewId());
         }
         jdbcTemplate.update(
-                "UPDATE Reviews SET content = ?, isPositive = ?, userId = ?, filmId = ?, useFul = ? WHERE id = ?",
+                "UPDATE Reviews SET content = ?, isPositive = ?, useFul = ? WHERE id = ?",
                 reviews.getContent(),
                 reviews.getIsPositive() ? 1 : 0,
-                reviews.getUserId(),
-                reviews.getFilmId(),
                 reviews.getUseful(),
                 reviews.getReviewId()
         );
