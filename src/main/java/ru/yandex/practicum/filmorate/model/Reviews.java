@@ -2,13 +2,20 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+
 
 @Data
 public class Reviews {
     private Long reviewId;
     private String content;
     private Boolean isPositive;
+    @NotNull
+    @Positive
     private Long userId;
+    @NotNull
+    @Positive
     private Long filmId;
     private Integer useful = 0;
 

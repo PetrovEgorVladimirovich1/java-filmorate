@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Reviews;
 import ru.yandex.practicum.filmorate.service.ReviewsService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Slf4j
@@ -22,7 +23,7 @@ public class ReviewsController {
     }
 
     @PostMapping
-    public Reviews create(@RequestBody Reviews reviews) {
+    public Reviews create(@Valid @RequestBody Reviews reviews) {
         log.info("Пришел POST запрос /reviews с телом: {}", reviews);
         Reviews response = reviewsService.create(reviews);
         log.info("Отправлен ответ для POST запроса /reviews с телом: {}", response);
@@ -30,7 +31,7 @@ public class ReviewsController {
     }
 
     @PutMapping
-    public Reviews update(@RequestBody Reviews reviews) {
+    public Reviews update(@Valid @RequestBody Reviews reviews) {
         log.info("Пришел PUT запрос /reviews с телом: {}", reviews);
         Reviews response = reviewsService.update(reviews);
         log.info("Отправлен ответ для PUT запроса /reviews с телом: {}", response);
