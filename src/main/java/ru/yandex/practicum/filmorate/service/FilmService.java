@@ -53,7 +53,19 @@ public class FilmService {
         log.info("Лайк удалён.");
     }
 
-    public List<Film> getPopularFilms(int count) {
-        return filmStorage.getPopularFilms(count);
+    /**
+     * метод определяет фильмы с максимальным количеством лайков среди всех фильмов (genreId == null И
+     * year == null), среди фильмов одного года (genreId == null), среди фильмов одного жанра (year == null),
+     * либо среди фильмов определенного жанра и года выпуска.
+     * при введении неверного года возвращается пустой список
+     * при введении неверного id жанра возвращается пустой список
+     *
+     * @param count   максимальеая длина возвращаемого списка
+     * @param genreId id жанра по которому ведется поиск
+     * @param year    год выхода фильма в прокат
+     * @return возвращает список объектов класса Film
+     */
+    public List<Film> getPopularFilms(int count, Integer genreId, Integer year) {
+        return filmStorage.getPopularFilms(count, genreId, year);
     }
 }
