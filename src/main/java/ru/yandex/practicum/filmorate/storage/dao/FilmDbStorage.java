@@ -193,6 +193,25 @@ public class FilmDbStorage implements FilmStorage {
         return new ArrayList<>();
     }
 
+    /**
+     * метод для удаления записи о фильме из таблицы films.
+     * предполагается, что данные из связанных таблиц БД удалит каскадом
+     * т.е. при создании новых таблиц связанных с таблицей films надо указывать -
+     * "REFERENCES films (id) ON DELETE CASCADE"
+     *
+     * @param filmId id экземпляра класса Film
+     * @throws IncorrectParamException при отсутствии элемента с данным id
+     */
+    @Override
+    public void deleteFilm(Integer filmId) {
+        String sql = "DELETE FROM films " +
+                "WHERE id = ?";
+        int count = jdbcTemplate.update(sql, filmId);
+        if (count == 0) {
+            throw new IncorrectParamException("Невереный id!");
+        }
+    }
+
     private Film makeFilm(ResultSet rs) throws SQLException {
         Film film = Film.builder()
                 .id(rs.getLong("id"))
