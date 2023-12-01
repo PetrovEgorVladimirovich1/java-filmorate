@@ -3,7 +3,6 @@
 package ru.yandex.practicum.filmorate.storage.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -17,6 +16,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Component
 public class ReviewsDbStorage implements ReviewsStorage {
@@ -39,7 +39,7 @@ public class ReviewsDbStorage implements ReviewsStorage {
                     statement.setInt(2, reviews.getIsPositive() ? 1 : 0);
                     statement.setLong(3, reviews.getUserId());
                     statement.setLong(4, reviews.getFilmId());
-                    statement.setInt(5, reviews.getUseful());
+                    statement.setInt(5, 0);
                     return statement;
                 }, keyHolder
         );
@@ -53,13 +53,12 @@ public class ReviewsDbStorage implements ReviewsStorage {
             throw new ValidationException("Not found key: " + reviews.getReviewId());
         }
         jdbcTemplate.update(
-                "UPDATE Reviews SET content = ?, isPositive = ?, useFul = ? WHERE id = ?",
+                "UPDATE Reviews SET content = ?, isPositive = ? WHERE id = ?",
                 reviews.getContent(),
                 reviews.getIsPositive() ? 1 : 0,
-                reviews.getUseful(),
                 reviews.getReviewId()
         );
-        return reviews;
+        return get(reviews.getReviewId());
     }
 
     @Override
@@ -80,7 +79,10 @@ public class ReviewsDbStorage implements ReviewsStorage {
         String sql = "SELECT * FROM Reviews"
                 + (filmId == null ? "" : " WHERE filmid = " + filmId)
                 + (count == null ? " LIMIT 10;" : " LIMIT " + count + ";");
-        return this.jdbcTemplate.query(sql, this::mapRow);
+        return this.jdbcTemplate.query(sql, this::mapRow)
+                .stream()
+                .sorted((o1, o2) -> o2.getUseful() - o1.getUseful())
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -117,7 +119,10 @@ public class ReviewsDbStorage implements ReviewsStorage {
 
     @Override
     public List<Reviews> getAll() {
-        return jdbcTemplate.query("SELECT * FROM Reviews", this::mapRow);
+        return jdbcTemplate.query("SELECT * FROM Reviews", this::mapRow)
+                .stream()
+                .sorted((o1, o2) -> o2.getUseful() - o1.getUseful())
+                .collect(Collectors.toList());
     }
 
     private Reviews mapRow(ResultSet rs, int rowNum) throws SQLException {
