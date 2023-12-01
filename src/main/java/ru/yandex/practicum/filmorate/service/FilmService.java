@@ -69,4 +69,17 @@ public class FilmService {
         userService.getByIdUser(userId);
         return filmStorage.getUserRecommendations(userId);
     }
+
+    /**
+     * метод для удаления записи о фильме из таблицы films.
+     * предполагается, что данные из связанных таблиц БД удалит каскадом
+     * т.е. при создании новых таблиц связанных с таблицей films надо указывать -
+     * "REFERENCES films (id) ON DELETE CASCADE"
+     *
+     * @param filmId id экземпляра класса Film
+     * @throws IncorrectParamException при отсутствии элемента с данным id
+     */
+    public void deleteFilm(Integer filmId) {
+        filmStorage.deleteFilm(filmId);
+    }
 }
