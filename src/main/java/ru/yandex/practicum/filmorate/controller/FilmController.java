@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.IncorrectParamException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
@@ -38,6 +39,18 @@ public class FilmController {
     @GetMapping("/{id}")
     public Film getByIdFilm(@PathVariable long id) {
         return filmService.getByIdFilm(id);
+    }
+
+    @GetMapping("/director/{directorId}")
+    public List<Film> getDirectorByLikesOrYear(@PathVariable("directorId") long id,
+                                               @RequestParam("sortBy") String name) {
+        if (name.contains("year")) {
+            return filmService.getDirectorByYear(id);
+        }
+        if (name.contains("likes")) {
+            return filmService.getDirectorByLikes(id);
+        }
+        throw new IncorrectParamException("Неверный sortBy");
     }
 
     @PutMapping("/{id}/like/{userId}")

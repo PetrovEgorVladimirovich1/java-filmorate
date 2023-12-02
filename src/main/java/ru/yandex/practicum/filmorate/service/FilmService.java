@@ -5,7 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.dal.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.dal.FilmStorage;
 import ru.yandex.practicum.filmorate.validate.Validate;
 
@@ -15,10 +17,12 @@ import java.util.List;
 @Service
 public class FilmService {
     private final FilmStorage filmStorage;
+    private final DirectorStorage directorStorage;
 
     @Autowired
-    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage) {
+    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage, DirectorStorage directorStorage) {
         this.filmStorage = filmStorage;
+        this.directorStorage = directorStorage;
     }
 
     public Film create(Film film, BindingResult bindingResult) {
@@ -55,5 +59,15 @@ public class FilmService {
 
     public List<Film> getPopularFilms(int count) {
         return filmStorage.getPopularFilms(count);
+    }
+
+    public List<Film> getDirectorByLikes(long id) {
+        Director director = directorStorage.getDirectorById(id);
+        return filmStorage.getDirectorByLikes(director.getId());
+    }
+
+    public List<Film> getDirectorByYear(long id) {
+        Director director = directorStorage.getDirectorById(id);
+        return filmStorage.getDirectorByYear(director.getId());
     }
 }

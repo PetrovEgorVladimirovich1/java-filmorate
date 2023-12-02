@@ -7,7 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = IsBeforeBirthdayMovieValidator.class)
-@Past
+//@Past
 public @interface IsBeforeBirthdayMovie {
     String message() default "Дата должна быть не раньше {value}";
 
