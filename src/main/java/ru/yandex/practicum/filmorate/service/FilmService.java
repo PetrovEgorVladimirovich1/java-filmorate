@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
-import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.exception.IncorrectParamException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.dal.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.dal.FilmStorage;
@@ -69,7 +69,7 @@ public class FilmService {
         Director director = directorStorage.getDirectorById(id);
         return filmStorage.getDirectorByYear(director.getId());
     }
-      
+
     /**
      * Метод возвращает список фильмов которые не лайкнул userId, но лайкнули юзеры с походим набором лайков
      *
