@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
+import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.dal.UserStorage;
 import ru.yandex.practicum.filmorate.validate.Validate;
@@ -66,5 +67,9 @@ public class UserService {
 
     public List<User> getUserFriendsCommonWithOtherUser(long idUser, long idOtherUser) {
         return userStorage.getUserFriendsCommonWithOtherUser(idUser, idOtherUser);
+    }
+
+    public List<Feed> getFeeds(long id) {
+        return userStorage.getFeeds(id);
     }
 }

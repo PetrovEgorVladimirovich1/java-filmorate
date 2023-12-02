@@ -15,6 +15,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -113,19 +114,31 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public void addLike(long idFilm, long idUser) {
+        if (idUser <= 0 || idFilm <= 0) {
+            throw new IncorrectParamException("Неверный id!");
+        }
         String sql = "INSERT INTO likes (film_id, user_id) " +
                 "VALUES (?, ?)";
-        jdbcTemplate.update(sql, idFilm, idUser);
+        String sqlFeed = "INSERT INTO feeds (user_id, entity_id, event_type, operation, times) " +
+                "VALUES (?, ?, 'LIKE', 'ADD', ?)";
+        int count = jdbcTemplate.update(sql, idFilm, idUser);
+        if (count == 0) {
+            throw new IncorrectParamException("Невереный id!");
+        }
+        jdbcTemplate.update(sqlFeed, idUser, idFilm, Instant.now());
     }
 
     @Override
     public void deleteLike(long idFilm, long idUser) {
         String sql = "DELETE FROM likes " +
                 "WHERE film_id = ? AND user_id = ?";
+        String sqlFeed = "INSERT INTO feeds (user_id, entity_id, event_type, operation, times) " +
+                "VALUES (?, ?, 'LIKE', 'REMOVE', ?)";
         int count = jdbcTemplate.update(sql, idFilm, idUser);
         if (count == 0) {
             throw new IncorrectParamException("Невереный id!");
         }
+        jdbcTemplate.update(sqlFeed, idUser, idFilm, Instant.now());
     }
 
     @Override
