@@ -149,6 +149,82 @@ public class FilmDbStorage implements FilmStorage {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Метод возвращает список фильмов которые не лайкнул userId, но лайкнули юзеры с походим набором лайков
+     * валидность параметра не проверяется, юзер с userId должен существовать
+     *
+     * @param userId
+     * @return список объектов класса Film
+     */
+    @Override
+    public List<Film> getUserRecommendations(Integer userId) {
+        // создаем запрос для определения десяти юзеров с похожим набором лайков
+        String sql = "SELECT l.user_id " +
+                "FROM likes as l " +
+                "WHERE l.film_id IN " +
+                //вспомогательная таблица для определения лайков userId
+                "(SELECT film_id " +
+                "FROM likes l1 " +
+                "WHERE user_id = ?) AND l.user_id <> ?" +
+                "GROUP BY l.user_id " +
+                //сортируем по количеству совпадений
+                "ORDER BY COUNT(l.film_id) " +
+                "limit 10";
+
+        // находим id юзеров в похожим набором лайков отсортированный по похожести
+        final List<Integer> similarUserIds = jdbcTemplate.query(sql, (rs, rowNum) -> rs.getInt("user_id"), userId, userId);
+
+        // если пользователей c похожими лайками не нашлось возвращаем пустой список фильмов
+        if (similarUserIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+        // создаем универсальный запрос для нахождения списка фильмов которые лайкнул юзер
+        String sqlFilm = "SELECT f.id, " +
+                "f.name, " +
+                "f.description, " +
+                "f.release_date, " +
+                "f.duration, " +
+                "f.mpa_id, " +
+                "m.name AS mpa_name " +
+                "FROM likes AS l LEFT JOIN films AS f ON l.film_id = f.id " +
+                "LEFT JOIN mpa AS m ON f.mpa_id = m.id " +
+                "WHERE l.user_id = ?";
+        // находим список фильмов которые лайкнул userId
+        List<Film> listFilmsWhichLikeUserId = jdbcTemplate.query(sqlFilm, (rs, rowNum) -> makeFilm(rs), userId);
+
+        // проходим по найденому ранее найденому списку юзеров
+        for (Integer similarUserId : similarUserIds) {
+            // находим список фильмов которые лайкнул похожий юзер
+            List<Film> listFilmsWhichLikeSimilarUser = jdbcTemplate.query(sqlFilm, (rs, rowNum) ->
+                    makeFilm(rs), similarUserId);
+            // находими различия в списках лайкнутых фильмов
+            listFilmsWhichLikeSimilarUser.removeAll(listFilmsWhichLikeUserId);
+            // если список не пустой, то возвращаем ответ
+            if (!(listFilmsWhichLikeSimilarUser.isEmpty())) return listFilmsWhichLikeSimilarUser;
+        }
+        //если различий не нашлось возвращаем пустой список
+        return new ArrayList<>();
+    }
+
+    /**
+     * метод для удаления записи о фильме из таблицы films.
+     * предполагается, что данные из связанных таблиц БД удалит каскадом
+     * т.е. при создании новых таблиц связанных с таблицей films надо указывать -
+     * "REFERENCES films (id) ON DELETE CASCADE"
+     *
+     * @param filmId id экземпляра класса Film
+     * @throws IncorrectParamException при отсутствии элемента с данным id
+     */
+    @Override
+    public void deleteFilm(Integer filmId) {
+        String sql = "DELETE FROM films " +
+                "WHERE id = ?";
+        int count = jdbcTemplate.update(sql, filmId);
+        if (count == 0) {
+            throw new IncorrectParamException("Невереный id!");
+        }
+    }
+
     private Film makeFilm(ResultSet rs) throws SQLException {
         Film film = Film.builder()
                 .id(rs.getLong("id"))
@@ -189,4 +265,6 @@ public class FilmDbStorage implements FilmStorage {
     private Long makeLike(ResultSet rs) throws SQLException {
         return rs.getLong("user_id");
     }
+
+
 }

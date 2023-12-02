@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import ru.yandex.practicum.filmorate.model.Feed;
+import ru.yandex.practicum.filmorate.exception.IncorrectParamException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.dal.UserStorage;
 import ru.yandex.practicum.filmorate.validate.Validate;
@@ -71,5 +72,18 @@ public class UserService {
 
     public List<Feed> getFeeds(long id) {
         return userStorage.getFeeds(id);
+    }
+
+    /**
+     * метод для удаления записи о юзере из таблицы users.
+     * предполагается, что данные из связанных таблиц БД удалит каскадом
+     * т.е. при создании новых таблиц связанных с таблицей users надо указывать -
+     * "REFERENCES users (id) ON DELETE CASCADE"
+     *
+     * @param usersId id экземпляра класса User
+     * @throws IncorrectParamException при отсутствии элемента с данным id
+     */
+    public void deleteUser(Integer usersId) {
+        userStorage.deleteUser(usersId);
     }
 }

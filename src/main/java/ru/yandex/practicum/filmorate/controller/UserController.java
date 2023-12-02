@@ -1,25 +1,25 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.IncorrectParamException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
 
     private final UserService userService;
-
-    @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
+    private final FilmService filmService;
 
     @PostMapping
     public User create(@Valid @RequestBody User user, BindingResult bindingResult) {
@@ -64,5 +64,31 @@ public class UserController {
     @GetMapping("/{id}/feed")
     public List<Feed> getFeeds(@PathVariable("id") long id) {
         return userService.getFeeds(id);
+    }
+
+    /**
+     * Метод возвращает список фильмов которые не лайкнул userId, но лайкнули юзеры с походим набором лайков
+     *
+     * @param userId
+     * @return список объектов класса Film
+     * @throws IncorrectParamException если юзера с userId не существует
+     */
+    @GetMapping("/{id}/recommendations")
+    public List<Film> getRecommendations(@PathVariable("id") Integer userId) {
+        return filmService.recommendations(userId);
+    }
+
+    /**
+     * метод для удаления записи о юзере из таблицы users.
+     * предполагается, что данные из связанных таблиц БД удалит каскадом
+     * т.е. при создании новых таблиц связанных с таблицей users надо указывать -
+     * "REFERENCES users (id) ON DELETE CASCADE"
+     *
+     * @param id id экземпляра класса User
+     * @throws IncorrectParamException при отсутствии элемента с данным id
+     */
+    @DeleteMapping("/{id}")
+    public void deleteUser(@PathVariable("id") Integer id) {
+        userService.deleteUser(id);
     }
 }
