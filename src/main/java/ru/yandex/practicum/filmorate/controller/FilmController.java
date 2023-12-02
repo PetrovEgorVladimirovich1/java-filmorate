@@ -67,4 +67,18 @@ public class FilmController {
     public List<Film> getPopularFilms(@RequestParam(defaultValue = "10", required = false) int count) {
         return filmService.getPopularFilms(count);
     }
+
+    /**
+     * метод для удаления записи о фильме из таблицы films.
+     * предполагается, что данные из связанных таблиц БД удалит каскадом
+     * т.е. при создании новых таблиц связанных с таблицей films надо указывать -
+     * "REFERENCES films (id) ON DELETE CASCADE"
+     *
+     * @param id id экземпляра класса Film
+     * @throws IncorrectParamException при отсутствии элемента с данным id
+     */
+    @DeleteMapping("/{id}")
+    public void deleteFilm(@PathVariable("id") Integer id) {
+        filmService.deleteFilm(id);
+    }
 }
