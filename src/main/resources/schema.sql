@@ -43,6 +43,6 @@ CREATE TABLE IF NOT EXISTS directors (
     name varchar);
 
 CREATE TABLE IF NOT EXISTS films_director (
-    director_id BIGINT NOT NULL REFERENCES directors (id),
-    film_id BIGINT NOT NULL REFERENCES films (id),
+    director_id BIGINT NOT NULL REFERENCES directors (id) ON DELETE CASCADE,
+    film_id BIGINT NOT NULL REFERENCES films (id) ON DELETE CASCADE,
     PRIMARY KEY (director_id, film_id));
