@@ -95,4 +95,9 @@ public class FilmService {
     public void deleteFilm(Integer filmId) {
         filmStorage.deleteFilm(filmId);
     }
+
+    public List<Film> getFilmsBySearch(String query, String by) {
+        log.info("Фильмы найдены");
+        return filmStorage.getFilmsBySearch(query, by);
+    }
 }

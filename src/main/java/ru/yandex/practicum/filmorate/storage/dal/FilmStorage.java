@@ -43,4 +43,6 @@ public interface FilmStorage {
      * @throws IncorrectParamException при отсутствии элемента с данным id
      */
     void deleteFilm(Integer filmId);
+
+    List<Film> getFilmsBySearch(String query, String by);
 }
