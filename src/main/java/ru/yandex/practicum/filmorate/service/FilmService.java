@@ -96,6 +96,11 @@ public class FilmService {
         filmStorage.deleteFilm(filmId);
     }
 
+    public List<Film> getFilmsBySearch(String query, String by) {
+        log.info("Фильмы найдены");
+        return filmStorage.getFilmsBySearch(query, by);
+    }
+
     /**
      * метод определяет фильмы которые лайкнули оба юзера и сортирует из в порядке популярности
      *

@@ -53,4 +53,6 @@ public interface FilmStorage {
      * @throws IncorrectParamException если юзера с введенным id не существует
      */
     List<Film> getCommonFilms(Integer userId, Integer friendId);
+
+    List<Film> getFilmsBySearch(String query, String by);
 }

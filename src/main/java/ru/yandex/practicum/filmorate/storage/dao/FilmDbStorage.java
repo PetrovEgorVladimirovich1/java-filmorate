@@ -54,7 +54,7 @@ public class FilmDbStorage implements FilmStorage {
                     film.getId(),
                     genre.getId());
         }
-        for (Director director: film.getDirectors()) {
+        for (Director director : film.getDirectors()) {
             jdbcTemplate.update(sqlForFilmDirectors,
                     director.getId(),
                     film.getId());
@@ -89,7 +89,7 @@ public class FilmDbStorage implements FilmStorage {
                     genre.getId());
         }
         jdbcTemplate.update(sqlDell, film.getId());
-        for (Director director: film.getDirectors()) {
+        for (Director director : film.getDirectors()) {
             jdbcTemplate.update(sqlForFilmDirectors,
                     director.getId(),
                     film.getId());
@@ -318,7 +318,7 @@ public class FilmDbStorage implements FilmStorage {
         for (Long like : getLikesForFilm(film.getId())) {
             film.getLikes().add(like);
         }
-        for (Director director: getDirectorByIdFilm(film.getId())) {
+        for (Director director : getDirectorByIdFilm(film.getId())) {
             film.getDirectors().add(director);
         }
         return film;
@@ -349,5 +349,41 @@ public class FilmDbStorage implements FilmStorage {
 
     private Director makeDirector(ResultSet rs) throws SQLException {
         return new Director(rs.getLong("id"), rs.getString("name"));
+    }
+
+    public List<Film> getFilmsBySearch(String query, String by) {
+        List<Film> films = new ArrayList<>();
+        if (query.isEmpty() && by.isEmpty()) {
+            films = getFilms().stream()
+                    .sorted(Comparator.comparingInt(f0 -> f0.getLikes().size() * -1))
+                    .collect(Collectors.toList());
+        } else {
+            String sql = "SELECT f.id, " +
+                    "f.name, " +
+                    "f.description, " +
+                    "f.release_date, " +
+                    "f.duration, " +
+                    "f.mpa_id, " +
+                    "m.name AS mpa_name " +
+                    "FROM films AS f " +
+                    "LEFT JOIN mpa AS m ON f.mpa_id = m.id ";
+            if (!query.isEmpty()) {
+                if (by.contains("director") && by.contains("title")) {
+                    sql += "LEFT JOIN films_director AS fd ON f.id = fd.film_id " +
+                            "LEFT JOIN directors AS d ON fd.director_id = d.id " +
+                            "WHERE LOWER(f.name) LIKE '%" + query.toLowerCase() + "%' OR LOWER(d.name) LIKE '%" + query.toLowerCase() + "%'";
+                } else if (by.contains("director")) {
+                    sql += "LEFT JOIN films_director AS fd ON f.id = fd.film_id " +
+                            "LEFT JOIN directors AS d ON fd.director_id = d.id " +
+                            "WHERE LOWER(d.name) LIKE '%" + query.toLowerCase() + "%'";
+                } else if (by.contains("title")) {
+                    sql += "WHERE LOWER(f.name) LIKE '%" + query.toLowerCase() + "%'";
+                }
+            }
+            films = jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs));
+            films = films.stream().sorted(Comparator.comparingInt(f0 -> f0.getLikes().size() * -1))
+                    .collect(Collectors.toList());
+        }
+        return films;
     }
 }
