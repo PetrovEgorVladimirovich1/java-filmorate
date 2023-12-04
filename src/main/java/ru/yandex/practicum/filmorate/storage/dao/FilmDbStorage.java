@@ -270,6 +270,39 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
+    /**
+     * метод определяет фильмы которые лайкнули оба юзера и сортирует из в порядке популярности
+     *
+     * @param userId   id  которому ищутся общие фильмы
+     * @param friendId id юзера которого проверяют на наличие общих фильмов
+     * @return список POJO класса Film
+     * @throws IncorrectParamException если юзера с введенным id не существует
+     */
+    @Override
+    public List<Film> getCommonFilms(Integer userId, Integer friendId) {
+        //проверяем валидны ли ID
+        getByIdFilm(userId);
+        getByIdFilm(friendId);
+
+        String sql = "SELECT f1.* " +
+                "FROM " +
+                // определяем общие фильмы
+                "(SELECT f.*, " +
+                "m.name AS mpa_name " +
+                "FROM films AS f " +
+                "LEFT JOIN mpa AS m ON f.mpa_id = m.id " +
+                "LEFT JOIN likes AS l ON f.id = l.film_id " +
+                "WHERE l.user_id IN (?, ?) " +
+                "GROUP BY f.id " +
+                "HAVING COUNT(l.user_id) = 2) AS f1 " +
+                // прикрепляем таблицу лайков повторно, что бы отсортировать фильмы
+                "LEFT JOIN likes AS l1 ON f1.id = l1.film_id " +
+                "GROUP BY f1.id " +
+                "ORDER BY COUNT(l1.user_id) DESC ;";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs), userId, friendId);
+    }
+
+
     private Film makeFilm(ResultSet rs) throws SQLException {
         Film film = Film.builder()
                 .id(rs.getLong("id"))
