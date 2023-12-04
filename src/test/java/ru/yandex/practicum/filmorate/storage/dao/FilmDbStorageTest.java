@@ -76,7 +76,7 @@ class FilmDbStorageTest {
         userDbStorage.create(userTest);
         filmDbStorage.addLike(film.getId(), userTest.getId());
         System.out.println();
-        assertEquals(1, filmDbStorage.getPopularFilms(5).size());
+        assertEquals(1, filmDbStorage.getPopularFilmsByGenre(5, null, null).size());
     }
 
     @Test
@@ -107,6 +107,6 @@ class FilmDbStorageTest {
         filmDbStorage.addLike(film.getId(), userTest.getId());
         filmDbStorage.addLike(film.getId(), userTest1.getId());
         filmDbStorage.addLike(filmTest.getId(), userTest.getId());
-        assertEquals(2, filmDbStorage.getPopularFilms(5).size());
+        assertEquals(2, filmDbStorage.getPopularFilmsByGenre(5, null, null).size());
     }
 }
