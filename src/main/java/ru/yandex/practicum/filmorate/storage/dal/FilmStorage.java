@@ -20,6 +20,10 @@ public interface FilmStorage {
 
     List<Film> getPopularFilms(int count);
 
+    List<Film> getDirectorByLikes(long id);
+
+    List<Film> getDirectorByYear(long id);
+
     /**
      * Метод возвращает список фильмов которые не лайкнул userId, но лайкнули юзеры с походим набором лайков
      * валидность параметра не проверяется
@@ -50,5 +54,3 @@ public interface FilmStorage {
      */
     List<Film> getCommonFilms(Integer userId, Integer friendId);
 }
-
-

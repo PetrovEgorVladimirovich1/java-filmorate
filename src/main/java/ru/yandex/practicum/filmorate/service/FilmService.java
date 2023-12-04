@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import ru.yandex.practicum.filmorate.exception.IncorrectParamException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.dal.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.dal.FilmStorage;
 import ru.yandex.practicum.filmorate.validate.Validate;
 
@@ -19,6 +21,7 @@ import java.util.List;
 public class FilmService {
     @Qualifier("filmDbStorage")
     private final FilmStorage filmStorage;
+    private final DirectorStorage directorStorage;
     private final UserService userService;
 
     public Film create(Film film, BindingResult bindingResult) {
@@ -55,6 +58,16 @@ public class FilmService {
 
     public List<Film> getPopularFilms(int count) {
         return filmStorage.getPopularFilms(count);
+    }
+
+    public List<Film> getDirectorByLikes(long id) {
+        Director director = directorStorage.getDirectorById(id);
+        return filmStorage.getDirectorByLikes(director.getId());
+    }
+
+    public List<Film> getDirectorByYear(long id) {
+        Director director = directorStorage.getDirectorById(id);
+        return filmStorage.getDirectorByYear(director.getId());
     }
 
     /**

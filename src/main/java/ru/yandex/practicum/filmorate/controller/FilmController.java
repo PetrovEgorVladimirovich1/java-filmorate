@@ -41,6 +41,18 @@ public class FilmController {
         return filmService.getByIdFilm(id);
     }
 
+    @GetMapping("/director/{directorId}")
+    public List<Film> getDirectorByLikesOrYear(@PathVariable("directorId") long id,
+                                               @RequestParam("sortBy") String name) {
+        if (name.contains("year")) {
+            return filmService.getDirectorByYear(id);
+        }
+        if (name.contains("likes")) {
+            return filmService.getDirectorByLikes(id);
+        }
+        throw new IncorrectParamException("Неверный sortBy");
+    }
+
     @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable("id") long idFilm, @PathVariable("userId") long idUser) {
         filmService.addLike(idFilm, idUser);
