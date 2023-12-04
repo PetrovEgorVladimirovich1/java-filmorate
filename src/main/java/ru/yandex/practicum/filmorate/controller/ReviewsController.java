@@ -4,11 +4,8 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.model.ErrorResponse;
 import ru.yandex.practicum.filmorate.model.Reviews;
 import ru.yandex.practicum.filmorate.service.ReviewsService;
 
@@ -69,11 +66,8 @@ public class ReviewsController {
     }
 
 
-
-
-
     @PutMapping(value = "/{id}/like/{userId}")
-    public Reviews addLike(@PathVariable Long id,@PathVariable Long userId) {
+    public Reviews addLike(@PathVariable Long id, @PathVariable Long userId) {
         log.info("Пришел PUT запрос /{}/like/{}", id, userId);
         Reviews response = reviewsService.addLike(id, userId);
         log.info("Отправлен ответ для PUT запроса /{}/like/{}", id, userId);
@@ -82,7 +76,7 @@ public class ReviewsController {
 
 
     @PutMapping(value = "/{id}/dislike/{userId}")
-    public Reviews addDislike(@PathVariable Long id,@PathVariable Long userId) {
+    public Reviews addDislike(@PathVariable Long id, @PathVariable Long userId) {
         log.info("Пришел PUT запрос /{}/dislike/{}", id, userId);
         Reviews response = reviewsService.addDislike(id, userId);
         log.info("Отправлен ответ для PUT запроса /{}/dislike/{}", id, userId);
@@ -91,7 +85,7 @@ public class ReviewsController {
 
 
     @DeleteMapping(value = "/{id}/like/{userId}")
-    public Reviews removeLike(@PathVariable Long id,@PathVariable Long userId) {
+    public Reviews removeLike(@PathVariable Long id, @PathVariable Long userId) {
         log.info("Пришел DELETE запрос /{}/like/{}", id, userId);
         Reviews response = reviewsService.removeLike(id, userId);
         log.info("Отправлен ответ для DELETE запроса /{}/like/{}", id, userId);
@@ -100,14 +94,12 @@ public class ReviewsController {
 
 
     @DeleteMapping("/{id}/dislike/{userId}")
-    public Reviews removeDislike(@PathVariable Long id,@PathVariable Long userId) {
+    public Reviews removeDislike(@PathVariable Long id, @PathVariable Long userId) {
         log.info("Пришел DELETE запрос /{}/dislike/{}", id, userId);
         Reviews response = reviewsService.removeDislike(id, userId);
         log.info("Отправлен ответ для DELETE запроса /{}/dislike/{}", id, userId);
         return response;
     }
-
-
 
 
 }

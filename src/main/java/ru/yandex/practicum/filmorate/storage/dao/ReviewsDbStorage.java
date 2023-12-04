@@ -119,7 +119,7 @@ public class ReviewsDbStorage implements ReviewsStorage {
         List<Integer> useFul = jdbcTemplate.query("SELECT useFul FROM useful WHERE reviewId = ?",
                 (o1, o2) -> o1.getInt("useful"), rs.getInt("id"));
         Integer number = 0;
-        for (Integer a:useFul) {
+        for (Integer a : useFul) {
             number += a;
         }
         Reviews reviews = new Reviews(

@@ -6,7 +6,6 @@ import ru.yandex.practicum.filmorate.exception.IncorrectParamException;
 import ru.yandex.practicum.filmorate.model.Reviews;
 import ru.yandex.practicum.filmorate.storage.dal.ReviewsStorage;
 
-
 import javax.validation.ValidationException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,7 +19,6 @@ public class ReviewsService {
     public ReviewsService(ReviewsStorage reviewsStorage) {
         this.reviewsStorage = reviewsStorage;
     }
-
 
 
     public Reviews create(Reviews reviews) {
