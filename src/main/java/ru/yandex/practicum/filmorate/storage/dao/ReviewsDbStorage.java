@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.IncorrectParamException;
 import ru.yandex.practicum.filmorate.model.Reviews;
 import ru.yandex.practicum.filmorate.storage.dal.ReviewsStorage;
 
@@ -67,7 +68,11 @@ public class ReviewsDbStorage implements ReviewsStorage {
 
     @Override
     public Reviews get(Long id) {
-        return jdbcTemplate.queryForObject("SELECT * FROM Reviews WHERE id = ?", this::mapRow, id);
+        List<Reviews> reviewsList = jdbcTemplate.query("SELECT * FROM Reviews WHERE id = ?", this::mapRow, id);
+        if (reviewsList.isEmpty()) {
+            throw new IncorrectParamException("Неверный id!");
+        }
+        return reviewsList.get(0);
     }
 
     @Override
@@ -120,8 +125,8 @@ public class ReviewsDbStorage implements ReviewsStorage {
         Reviews reviews = new Reviews(
                 rs.getString("content"),
                 rs.getInt("ispositive") == 1,
-                rs.getLong("userid"),
-                rs.getLong("filmid")
+                rs.getLong("filmid"),
+                rs.getLong("userid")
         );
         reviews.setUseful(number);
         reviews.setReviewId(rs.getLong("id"));

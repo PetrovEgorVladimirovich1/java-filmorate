@@ -14,11 +14,7 @@ public class Reviews {
     private String content;
     @NotNull
     private Boolean isPositive;
-    @NotNull
-    @Positive
     private Long userId;
-    @NotNull
-    @Positive
     private Long filmId;
     private Integer useful = 0;
 

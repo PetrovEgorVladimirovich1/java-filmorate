@@ -155,4 +155,6 @@ public class ReviewsDbStorageTest {
         Reviews reviews2 = reviewsStorage.get(1L);
         Assertions.assertEquals(reviews2.getUseful(), -2);
     }
+
+
 }

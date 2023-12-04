@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.IncorrectParamException;
 import ru.yandex.practicum.filmorate.model.Reviews;
 import ru.yandex.practicum.filmorate.storage.dal.ReviewsStorage;
 
@@ -23,6 +24,9 @@ public class ReviewsService {
 
 
     public Reviews create(Reviews reviews) {
+        if (reviews.getUserId() <= 0 || reviews.getFilmId() <= 0) {
+            throw new IncorrectParamException("id меньше нуля");
+        }
         return reviewsStorage.create(reviews);
     }
 
@@ -49,8 +53,8 @@ public class ReviewsService {
         return reviewsStorage.getReviewsFilm(id, count)
                 .stream()
                 .sorted((o1, o2) -> o2.getUseful() - o1.getUseful())
-                //.sorted((a1, a2) -> (a2.getIsPositive() ? 1 : 0) - (a1.getIsPositive() ? 1 : 0))
                 .collect(Collectors.toList());
+
     }
 
 

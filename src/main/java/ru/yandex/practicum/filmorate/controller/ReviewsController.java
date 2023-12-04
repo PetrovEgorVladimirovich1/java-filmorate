@@ -2,10 +2,13 @@
 
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.ErrorResponse;
 import ru.yandex.practicum.filmorate.model.Reviews;
 import ru.yandex.practicum.filmorate.service.ReviewsService;
 
@@ -15,17 +18,16 @@ import java.util.List;
 @Slf4j
 @Component
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(value = "/reviews")
 public class ReviewsController {
     private final ReviewsService reviewsService;
 
-    @Autowired
-    public ReviewsController(ReviewsService reviewsService) {
-        this.reviewsService = reviewsService;
-    }
-
     @PostMapping
     public Reviews create(@Valid @RequestBody Reviews reviews) {
+        if (reviews == null) {
+            throw new NullPointerException();
+        }
         log.info("Пришел POST запрос /reviews с телом: {}", reviews);
         Reviews response = reviewsService.create(reviews);
         log.info("Отправлен ответ для POST запроса /reviews с телом: {}", response);
@@ -104,6 +106,8 @@ public class ReviewsController {
         log.info("Отправлен ответ для DELETE запроса /{}/dislike/{}", id, userId);
         return response;
     }
+
+
 
 
 }
