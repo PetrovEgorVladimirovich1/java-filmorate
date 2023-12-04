@@ -41,6 +41,18 @@ public class FilmController {
         return filmService.getByIdFilm(id);
     }
 
+    @GetMapping("/director/{directorId}")
+    public List<Film> getDirectorByLikesOrYear(@PathVariable("directorId") long id,
+                                               @RequestParam("sortBy") String name) {
+        if (name.contains("year")) {
+            return filmService.getDirectorByYear(id);
+        }
+        if (name.contains("likes")) {
+            return filmService.getDirectorByLikes(id);
+        }
+        throw new IncorrectParamException("Неверный sortBy");
+    }
+
     @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable("id") long idFilm, @PathVariable("userId") long idUser) {
         filmService.addLike(idFilm, idUser);
@@ -68,5 +80,26 @@ public class FilmController {
     @DeleteMapping("/{id}")
     public void deleteFilm(@PathVariable("id") Integer id) {
         filmService.deleteFilm(id);
+    }
+
+    @GetMapping("/search")
+    public List<Film> getFilmsBySearch(
+            @RequestParam(name = "query", defaultValue = "", required = false) String query,
+            @RequestParam(name = "by", defaultValue = "", required = false) String by) {
+        return filmService.getFilmsBySearch(query, by);
+    }
+
+    /**
+     * метод определяет фильмы которые лайкнули оба юзера и сортирует из в порядке популярности
+     *
+     * @param userId   id  которому ищутся общие фильмы
+     * @param friendId id юзера которого проверяют на наличие общих фильмов
+     * @return список POJO класса Film
+     * @throws IncorrectParamException если юзера с введенным id не существует
+     */
+    @GetMapping("/common")
+    public List<Film> getCommonFilms(@RequestParam int userId,
+                                     @RequestParam int friendId) {
+        return filmService.getCommonFilm(userId, friendId);
     }
 }

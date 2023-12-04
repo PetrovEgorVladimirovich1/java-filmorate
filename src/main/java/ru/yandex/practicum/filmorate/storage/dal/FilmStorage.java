@@ -20,6 +20,10 @@ public interface FilmStorage {
 
     List<Film> getPopularFilms(int count);
 
+    List<Film> getDirectorByLikes(long id);
+
+    List<Film> getDirectorByYear(long id);
+
     /**
      * Метод возвращает список фильмов которые не лайкнул userId, но лайкнули юзеры с походим набором лайков
      * валидность параметра не проверяется
@@ -39,6 +43,16 @@ public interface FilmStorage {
      * @throws IncorrectParamException при отсутствии элемента с данным id
      */
     void deleteFilm(Integer filmId);
+
+    /**
+     * метод определяет фильмы которые лайкнули оба юзера и сортирует из в порядке популярности
+     *
+     * @param userId   id  которому ищутся общие фильмы
+     * @param friendId id юзера которого проверяют на наличие общих фильмов
+     * @return список POJO класса Film
+     * @throws IncorrectParamException если юзера с введенным id не существует
+     */
+    List<Film> getCommonFilms(Integer userId, Integer friendId);
+
+    List<Film> getFilmsBySearch(String query, String by);
 }
-
-
