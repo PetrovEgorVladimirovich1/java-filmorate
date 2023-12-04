@@ -58,14 +58,16 @@ public class ReviewsController {
         return response;
     }
 
-
-    @GetMapping(value = "?filmId={id}&count={count}")
-    public List<Reviews> getReviewsFilm(@PathVariable Long id, @PathVariable Long count) {
-        log.info("Пришел GET запрос ?filmId={}&count={}", id, count);
-        List<Reviews> response = reviewsService.getReviewsFilm(id, count);
-        log.info("Отправлен ответ для GET запроса ?filmId={}&count={}", id, count);
+    @GetMapping()
+    public List<Reviews> getReviewsFilm(@RequestParam(required = false) Long filmId, @RequestParam(required = false) Long count) {
+        log.info("Пришел GET запрос ?filmId={}&count={}", filmId, count);
+        List<Reviews> response = reviewsService.getReviewsFilm(filmId, count);
+        log.info("Отправлен ответ для GET запроса ?filmId={}&count={}", filmId, count);
         return response;
     }
+
+
+
 
 
     @PutMapping(value = "/{id}/like/{userId}")
@@ -103,11 +105,5 @@ public class ReviewsController {
         return response;
     }
 
-    @GetMapping
-    public List<Reviews> getAll() {
-        log.info("Пришел GET запрос /reviews}");
-        List<Reviews> response = reviewsService.getAll();
-        log.info("Отправлен ответ для GET запроса /reviews с телом: {}", response);
-        return response;
-    }
+
 }

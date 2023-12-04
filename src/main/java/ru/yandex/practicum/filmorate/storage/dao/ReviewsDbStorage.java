@@ -10,13 +10,12 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Reviews;
 import ru.yandex.practicum.filmorate.storage.dal.ReviewsStorage;
 
-import javax.validation.ValidationException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
+
 
 @Component
 public class ReviewsDbStorage implements ReviewsStorage {
@@ -49,9 +48,6 @@ public class ReviewsDbStorage implements ReviewsStorage {
 
     @Override
     public Reviews update(Reviews reviews) {
-        if (get(reviews.getReviewId()) == null) {
-            throw new ValidationException("Not found key: " + reviews.getReviewId());
-        }
         jdbcTemplate.update(
                 "UPDATE Reviews SET content = ?, isPositive = ? WHERE id = ?",
                 reviews.getContent(),
@@ -79,10 +75,7 @@ public class ReviewsDbStorage implements ReviewsStorage {
         String sql = "SELECT * FROM Reviews"
                 + (filmId == null ? "" : " WHERE filmid = " + filmId)
                 + (count == null ? " LIMIT 10;" : " LIMIT " + count + ";");
-        return this.jdbcTemplate.query(sql, this::mapRow)
-                .stream()
-                .sorted((o1, o2) -> o2.getUseful() - o1.getUseful())
-                .collect(Collectors.toList());
+        return this.jdbcTemplate.query(sql, this::mapRow);
     }
 
     @Override
@@ -115,14 +108,6 @@ public class ReviewsDbStorage implements ReviewsStorage {
     public Reviews removeDislike(Long id, Long userId) {
         jdbcTemplate.update("DELETE FROM useful WHERE reviewId = ? AND userId = ?", id, userId);
         return get(id);
-    }
-
-    @Override
-    public List<Reviews> getAll() {
-        return jdbcTemplate.query("SELECT * FROM Reviews", this::mapRow)
-                .stream()
-                .sorted((o1, o2) -> o2.getUseful() - o1.getUseful())
-                .collect(Collectors.toList());
     }
 
     private Reviews mapRow(ResultSet rs, int rowNum) throws SQLException {

@@ -6,7 +6,9 @@ import ru.yandex.practicum.filmorate.model.Reviews;
 import ru.yandex.practicum.filmorate.storage.dal.ReviewsStorage;
 
 
+import javax.validation.ValidationException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ReviewsService {
@@ -26,6 +28,9 @@ public class ReviewsService {
 
 
     public Reviews update(Reviews reviews) {
+        if (get(reviews.getReviewId()) == null) {
+            throw new ValidationException("Not found key: " + reviews.getReviewId());
+        }
         return reviewsStorage.update(reviews);
     }
 
@@ -41,7 +46,11 @@ public class ReviewsService {
 
 
     public List<Reviews> getReviewsFilm(Long id, Long count) {
-        return reviewsStorage.getReviewsFilm(id, count);
+        return reviewsStorage.getReviewsFilm(id, count)
+                .stream()
+                .sorted((o1, o2) -> o2.getUseful() - o1.getUseful())
+                //.sorted((a1, a2) -> (a2.getIsPositive() ? 1 : 0) - (a1.getIsPositive() ? 1 : 0))
+                .collect(Collectors.toList());
     }
 
 
@@ -64,7 +73,4 @@ public class ReviewsService {
         return reviewsStorage.removeDislike(id, userId);
     }
 
-    public List<Reviews> getAll() {
-        return reviewsStorage.getAll();
-    }
 }
