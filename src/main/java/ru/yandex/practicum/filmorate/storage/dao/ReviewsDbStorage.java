@@ -85,8 +85,7 @@ public class ReviewsDbStorage implements ReviewsStorage {
 
     @Override
     public Reviews addLike(Long id, Long userId) {
-        this.jdbcTemplate.
-                update("INSERT INTO useful(reviewId, userId, useFul) VALUES (?, ?, ?)",
+        this.jdbcTemplate.update("INSERT INTO useful(reviewId, userId, useFul) VALUES (?, ?, ?)",
                         id,
                         userId,
                         1);
@@ -95,8 +94,7 @@ public class ReviewsDbStorage implements ReviewsStorage {
 
     @Override
     public Reviews addDislike(Long id, Long userId) {
-        this.jdbcTemplate.
-                update("INSERT INTO useful (reviewId, userId, useFul) VALUES (?, ?, ?)",
+        this.jdbcTemplate.update("INSERT INTO useful (reviewId, userId, useFul) VALUES (?, ?, ?)",
                         id,
                         userId,
                         -1);
