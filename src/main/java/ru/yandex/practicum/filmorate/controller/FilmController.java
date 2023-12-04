@@ -85,10 +85,10 @@ public class FilmController {
     @GetMapping("/search")
     public List<Film> getFilmsBySearch(
             @RequestParam(name = "query", defaultValue = "", required = false) String query,
-            @RequestParam(name = "by", defaultValue = "", required = false) String by
-    ) {
+            @RequestParam(name = "by", defaultValue = "", required = false) String by) {
         return filmService.getFilmsBySearch(query, by);
     }
+
     /**
      * метод определяет фильмы которые лайкнули оба юзера и сортирует из в порядке популярности
      *

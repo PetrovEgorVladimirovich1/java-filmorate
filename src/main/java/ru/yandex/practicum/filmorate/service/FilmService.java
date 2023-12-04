@@ -100,6 +100,7 @@ public class FilmService {
         log.info("Фильмы найдены");
         return filmStorage.getFilmsBySearch(query, by);
     }
+
     /**
      * метод определяет фильмы которые лайкнули оба юзера и сортирует из в порядке популярности
      *
