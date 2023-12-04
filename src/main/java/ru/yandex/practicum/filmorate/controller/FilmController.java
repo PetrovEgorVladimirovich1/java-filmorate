@@ -63,10 +63,26 @@ public class FilmController {
         filmService.deleteLike(idFilm, idUser);
     }
 
+    /**
+     * метод определяет фильмы с максимальным количеством лайков среди всех фильмов (
+     * параметры genreId И year отсутствуют), среди фильмов одного года (параметр genreId
+     * отсутствует), среди фильмов одного жанра (параметр year отсутствует),
+     * либо среди фильмов определенного жанра и года выпуска.
+     * при введении неверного года возвращается пустой список
+     * при введении неверного id жанра возвращается пустой список
+     *
+     * @param count   максимальеая длина возвращаемого списка
+     * @param genreId id жанра по которому ведется поиск
+     * @param year    год выхода фильма в прокат
+     * @return возвращает список объектов класса Film
+     */
     @GetMapping("/popular")
-    public List<Film> getPopularFilms(@RequestParam(defaultValue = "10", required = false) int count) {
-        return filmService.getPopularFilms(count);
+    public List<Film> getPopularFilmsByGenre(@RequestParam(defaultValue = "10", required = false) int count,
+                                             @RequestParam(required = false) Integer genreId,
+                                             @RequestParam(required = false) Integer year) {
+        return filmService.getPopularFilmsByGenre(count, genreId, year);
     }
+
 
     /**
      * метод для удаления записи о фильме из таблицы films.
