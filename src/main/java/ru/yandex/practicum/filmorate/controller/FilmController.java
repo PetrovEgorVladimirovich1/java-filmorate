@@ -69,4 +69,18 @@ public class FilmController {
     public void deleteFilm(@PathVariable("id") Integer id) {
         filmService.deleteFilm(id);
     }
+
+    /**
+     * метод определяет фильмы которые лайкнули оба юзера и сортирует из в порядке популярности
+     *
+     * @param userId   id  которому ищутся общие фильмы
+     * @param friendId id юзера которого проверяют на наличие общих фильмов
+     * @return список POJO класса Film
+     * @throws IncorrectParamException если юзера с введенным id не существует
+     */
+    @GetMapping("/common")
+    public List<Film> getCommonFilms(@RequestParam int userId,
+                                     @RequestParam int friendId) {
+        return filmService.getCommonFilm(userId, friendId);
+    }
 }
