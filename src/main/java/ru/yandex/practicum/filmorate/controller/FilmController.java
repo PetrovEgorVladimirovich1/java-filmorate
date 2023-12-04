@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.IncorrectParamException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
@@ -40,6 +41,18 @@ public class FilmController {
         return filmService.getByIdFilm(id);
     }
 
+    @GetMapping("/director/{directorId}")
+    public List<Film> getDirectorByLikesOrYear(@PathVariable("directorId") long id,
+                                               @RequestParam("sortBy") String name) {
+        if (name.contains("year")) {
+            return filmService.getDirectorByYear(id);
+        }
+        if (name.contains("likes")) {
+            return filmService.getDirectorByLikes(id);
+        }
+        throw new IncorrectParamException("Неверный sortBy");
+    }
+
     @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable("id") long idFilm, @PathVariable("userId") long idUser) {
         filmService.addLike(idFilm, idUser);
@@ -53,5 +66,33 @@ public class FilmController {
     @GetMapping("/popular")
     public List<Film> getPopularFilms(@RequestParam(defaultValue = "10", required = false) int count) {
         return filmService.getPopularFilms(count);
+    }
+
+    /**
+     * метод для удаления записи о фильме из таблицы films.
+     * предполагается, что данные из связанных таблиц БД удалит каскадом
+     * т.е. при создании новых таблиц связанных с таблицей films надо указывать -
+     * "REFERENCES films (id) ON DELETE CASCADE"
+     *
+     * @param id id экземпляра класса Film
+     * @throws IncorrectParamException при отсутствии элемента с данным id
+     */
+    @DeleteMapping("/{id}")
+    public void deleteFilm(@PathVariable("id") Integer id) {
+        filmService.deleteFilm(id);
+    }
+
+    /**
+     * метод определяет фильмы которые лайкнули оба юзера и сортирует из в порядке популярности
+     *
+     * @param userId   id  которому ищутся общие фильмы
+     * @param friendId id юзера которого проверяют на наличие общих фильмов
+     * @return список POJO класса Film
+     * @throws IncorrectParamException если юзера с введенным id не существует
+     */
+    @GetMapping("/common")
+    public List<Film> getCommonFilms(@RequestParam int userId,
+                                     @RequestParam int friendId) {
+        return filmService.getCommonFilm(userId, friendId);
     }
 }

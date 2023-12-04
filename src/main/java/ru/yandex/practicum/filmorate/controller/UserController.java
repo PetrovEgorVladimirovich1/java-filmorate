@@ -71,4 +71,18 @@ public class UserController {
     public List<Film> getRecommendations(@PathVariable("id") Integer userId) {
         return filmService.recommendations(userId);
     }
+
+    /**
+     * метод для удаления записи о юзере из таблицы users.
+     * предполагается, что данные из связанных таблиц БД удалит каскадом
+     * т.е. при создании новых таблиц связанных с таблицей users надо указывать -
+     * "REFERENCES users (id) ON DELETE CASCADE"
+     *
+     * @param id id экземпляра класса User
+     * @throws IncorrectParamException при отсутствии элемента с данным id
+     */
+    @DeleteMapping("/{id}")
+    public void deleteUser(@PathVariable("id") Integer id) {
+        userService.deleteUser(id);
+    }
 }
