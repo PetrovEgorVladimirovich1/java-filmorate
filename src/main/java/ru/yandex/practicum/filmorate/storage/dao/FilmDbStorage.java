@@ -16,8 +16,8 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -142,11 +142,11 @@ public class FilmDbStorage implements FilmStorage {
                 "VALUES (?, ?)";
         String sqlFeed = "INSERT INTO feeds (user_id, entity_id, event_type, operation, times) " +
                 "VALUES (?, ?, 'LIKE', 'ADD', ?)";
+        jdbcTemplate.update(sqlFeed, idUser, idFilm, Instant.now());
         int count = jdbcTemplate.update(sql, idFilm, idUser);
         if (count == 0) {
             throw new IncorrectParamException("Неверный id!");
         }
-        jdbcTemplate.update(sqlFeed, idUser, idFilm, Instant.now());
     }
 
     @Override
@@ -329,7 +329,7 @@ public class FilmDbStorage implements FilmStorage {
                 "WHERE id = ?";
         int count = jdbcTemplate.update(sql, filmId);
         if (count == 0) {
-            throw new IncorrectParamException("Невереный id!");
+            throw new IncorrectParamException("Неверный id!");
         }
     }
 

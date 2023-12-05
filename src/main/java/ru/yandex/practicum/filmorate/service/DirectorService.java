@@ -21,7 +21,7 @@ public class DirectorService {
 
     public Director createDirector(Director director) {
         if (director.getName() == null || director.getName().isBlank()) {
-            throw new  ValidationException("Отсутствует имя режиссёра");
+            throw new ValidationException("Отсутствует имя режиссёра");
         }
         directorStorage.createDirector(director);
         log.info("Режиссёр успешно создан. {}", director);
