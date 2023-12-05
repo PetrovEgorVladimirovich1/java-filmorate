@@ -144,7 +144,7 @@ public class FilmDbStorage implements FilmStorage {
                 "VALUES (?, ?, 'LIKE', 'ADD', ?)";
         int count = jdbcTemplate.update(sql, idFilm, idUser);
         if (count == 0) {
-            throw new IncorrectParamException("Невереный id!");
+            throw new IncorrectParamException("Неверный id!");
         }
         jdbcTemplate.update(sqlFeed, idUser, idFilm, Instant.now());
     }
@@ -157,7 +157,7 @@ public class FilmDbStorage implements FilmStorage {
                 "VALUES (?, ?, 'LIKE', 'REMOVE', ?)";
         int count = jdbcTemplate.update(sql, idFilm, idUser);
         if (count == 0) {
-            throw new IncorrectParamException("Невереный id!");
+            throw new IncorrectParamException("Неверный id!");
         }
         jdbcTemplate.update(sqlFeed, idUser, idFilm, Instant.now());
     }

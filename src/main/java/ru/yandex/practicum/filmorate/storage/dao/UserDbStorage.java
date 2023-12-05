@@ -147,7 +147,7 @@ public class UserDbStorage implements UserStorage {
                 "WHERE id = ?";
         int count = jdbcTemplate.update(sql, userId);
         if (count == 0) {
-            throw new IncorrectParamException("Невереный id!");
+            throw new IncorrectParamException("Неверный id!");
         }
     }
 

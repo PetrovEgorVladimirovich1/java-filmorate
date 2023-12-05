@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import ru.yandex.practicum.filmorate.exception.IncorrectParamException;
@@ -47,8 +48,12 @@ public class FilmService {
     }
 
     public void addLike(long idFilm, long idUser) {
-        filmStorage.addLike(idFilm, idUser);
-        log.info("Добавлен лайк.");
+        try {
+            filmStorage.addLike(idFilm, idUser);
+            log.info("Добавлен лайк.");
+        } catch (DuplicateKeyException e) {
+            log.info("Попытка дублирования лайка!");
+        }
     }
 
     public void deleteLike(long idFilm, long idUser) {
