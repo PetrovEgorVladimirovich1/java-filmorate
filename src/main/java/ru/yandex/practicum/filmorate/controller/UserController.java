@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.IncorrectParamException;
+import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -58,6 +59,11 @@ public class UserController {
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> getUserFriendsCommonWithOtherUser(@PathVariable("id") long idUser, @PathVariable("otherId") long idOtherUser) {
         return userService.getUserFriendsCommonWithOtherUser(idUser, idOtherUser);
+    }
+
+    @GetMapping("/{id}/feed")
+    public List<Feed> getFeeds(@PathVariable("id") long id) {
+        return userService.getFeeds(id);
     }
 
     /**

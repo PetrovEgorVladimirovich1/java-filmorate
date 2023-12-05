@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.dal;
 
 import ru.yandex.practicum.filmorate.exception.IncorrectParamException;
+import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
@@ -21,6 +22,8 @@ public interface UserStorage {
     List<User> getUserFriends(long id);
 
     List<User> getUserFriendsCommonWithOtherUser(long idUser, long idOtherUser);
+
+    List<Feed> getFeeds(long id);
 
     /**
      * метод для удаления записи о юзере из таблицы users.

@@ -14,6 +14,7 @@ import ru.yandex.practicum.filmorate.storage.dal.ReviewsStorage;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
@@ -31,6 +32,8 @@ public class ReviewsDbStorage implements ReviewsStorage {
     @Override
     public Reviews create(Reviews reviews) {
         String sql = "INSERT INTO Reviews (content, isPositive, userId, filmId, useFul) VALUES (?, ?, ?, ?, ?)";
+        String sqlFeed = "INSERT INTO feeds (user_id, entity_id, event_type, operation, times) " +
+                "VALUES (?, ?, 'REVIEW', 'ADD', ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(
                 con -> {
@@ -44,23 +47,31 @@ public class ReviewsDbStorage implements ReviewsStorage {
                 }, keyHolder
         );
         reviews.setReviewId(Objects.requireNonNull(keyHolder.getKey()).longValue());
+        jdbcTemplate.update(sqlFeed, reviews.getUserId(), reviews.getReviewId(), Instant.now());
         return reviews;
     }
 
     @Override
     public Reviews update(Reviews reviews) {
+        String sqlFeed = "INSERT INTO feeds (user_id, entity_id, event_type, operation, times) " +
+                "VALUES (?, ?, 'REVIEW', 'UPDATE', ?)";
         jdbcTemplate.update(
                 "UPDATE Reviews SET content = ?, isPositive = ? WHERE id = ?",
                 reviews.getContent(),
                 reviews.getIsPositive() ? 1 : 0,
                 reviews.getReviewId()
         );
-        return get(reviews.getReviewId());
+        reviews = get(reviews.getReviewId());
+        jdbcTemplate.update(sqlFeed, reviews.getUserId(), reviews.getFilmId(), Instant.now());
+        return reviews;
     }
 
     @Override
     public Reviews remove(Long id) {
         Reviews reviews = get(id);
+        String sqlFeed = "INSERT INTO feeds (user_id, entity_id, event_type, operation, times) " +
+                "VALUES (?, ?, 'REVIEW', 'REMOVE', ?)";
+        jdbcTemplate.update(sqlFeed, reviews.getUserId(), reviews.getFilmId(), Instant.now());
         jdbcTemplate.update("DELETE FROM useful WHERE reviewId = ?", id);
         jdbcTemplate.update("DELETE FROM Reviews WHERE id = ?", id);
         return reviews;
@@ -86,18 +97,18 @@ public class ReviewsDbStorage implements ReviewsStorage {
     @Override
     public Reviews addLike(Long id, Long userId) {
         this.jdbcTemplate.update("INSERT INTO useful(reviewId, userId, useFul) VALUES (?, ?, ?)",
-                        id,
-                        userId,
-                        1);
+                id,
+                userId,
+                1);
         return get(id);
     }
 
     @Override
     public Reviews addDislike(Long id, Long userId) {
         this.jdbcTemplate.update("INSERT INTO useful (reviewId, userId, useFul) VALUES (?, ?, ?)",
-                        id,
-                        userId,
-                        -1);
+                id,
+                userId,
+                -1);
         return get(id);
     }
 

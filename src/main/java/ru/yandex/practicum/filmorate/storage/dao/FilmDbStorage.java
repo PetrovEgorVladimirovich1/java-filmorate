@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.dao;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -17,12 +16,12 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-@Slf4j
 public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
@@ -136,12 +135,17 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public void addLike(long idFilm, long idUser) {
+        if (idUser <= 0 || idFilm <= 0) {
+            throw new IncorrectParamException("Неверный id!");
+        }
         String sql = "INSERT INTO likes (film_id, user_id) " +
                 "VALUES (?, ?)";
-        try {
-            jdbcTemplate.update(sql, idFilm, idUser);
-        } catch (Exception e) {
-            log.error("Лайк от юзера {} фильму {} уже добавлен", idUser, idFilm);
+        String sqlFeed = "INSERT INTO feeds (user_id, entity_id, event_type, operation, times) " +
+                "VALUES (?, ?, 'LIKE', 'ADD', ?)";
+        jdbcTemplate.update(sqlFeed, idUser, idFilm, Instant.now());
+        int count = jdbcTemplate.update(sql, idFilm, idUser);
+        if (count == 0) {
+            throw new IncorrectParamException("Неверный id!");
         }
     }
 
@@ -149,10 +153,13 @@ public class FilmDbStorage implements FilmStorage {
     public void deleteLike(long idFilm, long idUser) {
         String sql = "DELETE FROM likes " +
                 "WHERE film_id = ? AND user_id = ?";
+        String sqlFeed = "INSERT INTO feeds (user_id, entity_id, event_type, operation, times) " +
+                "VALUES (?, ?, 'LIKE', 'REMOVE', ?)";
         int count = jdbcTemplate.update(sql, idFilm, idUser);
         if (count == 0) {
-            throw new IncorrectParamException("Невереный id!");
+            throw new IncorrectParamException("Неверный id!");
         }
+        jdbcTemplate.update(sqlFeed, idUser, idFilm, Instant.now());
     }
 
     /**
@@ -322,7 +329,7 @@ public class FilmDbStorage implements FilmStorage {
                 "WHERE id = ?";
         int count = jdbcTemplate.update(sql, filmId);
         if (count == 0) {
-            throw new IncorrectParamException("Невереный id!");
+            throw new IncorrectParamException("Неверный id!");
         }
     }
 

@@ -6,6 +6,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.IncorrectParamException;
+import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.dal.UserStorage;
 
@@ -13,6 +14,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
@@ -82,20 +84,26 @@ public class UserDbStorage implements UserStorage {
         }
         String sql = "INSERT INTO friends (user_id, friend_id) " +
                 "VALUES (?, ?)";
+        String sqlFeed = "INSERT INTO feeds (user_id, entity_id, event_type, operation, times) " +
+                "VALUES (?, ?, 'FRIEND', 'ADD', ?)";
         int count = jdbcTemplate.update(sql, idUser, idFriend);
         if (count == 0) {
             throw new IncorrectParamException("Неверный id!");
         }
+        jdbcTemplate.update(sqlFeed, idUser, idFriend, Instant.now());
     }
 
     @Override
     public void deleteFriend(long idUser, long idFriend) {
         String sql = "DELETE FROM friends " +
                 "WHERE user_id = ? AND friend_id = ?";
+        String sqlFeed = "INSERT INTO feeds (user_id, entity_id, event_type, operation, times) " +
+                "VALUES (?, ?, 'FRIEND', 'REMOVE', ?)";
         int count = jdbcTemplate.update(sql, idUser, idFriend);
         if (count == 0) {
             throw new IncorrectParamException("Неверный id!");
         }
+        jdbcTemplate.update(sqlFeed, idUser, idFriend, Instant.now());
     }
 
     /**
@@ -117,6 +125,13 @@ public class UserDbStorage implements UserStorage {
         return friendsUser;
     }
 
+    @Override
+    public List<Feed> getFeeds(long id) {
+        getByIdUser(id);
+        String sql = "SELECT * FROM feeds WHERE user_id = ?";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> makeFeed(rs), id);
+    }
+
     /**
      * метод для удаления записи о фильме из таблицы users.
      * предполагается, что данные из связанных таблиц БД удалит каскадом
@@ -132,7 +147,7 @@ public class UserDbStorage implements UserStorage {
                 "WHERE id = ?";
         int count = jdbcTemplate.update(sql, userId);
         if (count == 0) {
-            throw new IncorrectParamException("Невереный id!");
+            throw new IncorrectParamException("Неверный id!");
         }
     }
 
@@ -142,5 +157,14 @@ public class UserDbStorage implements UserStorage {
                 rs.getString("login"),
                 rs.getString("name"),
                 rs.getDate("birthday").toLocalDate());
+    }
+
+    private Feed makeFeed(ResultSet rs) throws SQLException {
+        return new Feed(rs.getLong("event_id"),
+                rs.getLong("user_id"),
+                rs.getLong("entity_id"),
+                rs.getString("event_type"),
+                rs.getString("operation"),
+                rs.getTimestamp("times").getTime());
     }
 }
