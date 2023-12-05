@@ -162,12 +162,62 @@ public class FilmDbStorage implements FilmStorage {
         jdbcTemplate.update(sqlFeed, idUser, idFilm, Instant.now());
     }
 
+    /**
+     * метод определяет фильмы с максимальным количеством лайков среди всех фильмов (genreId == null И
+     * year == null), среди фильмов одного года (genreId == null), среди фильмов одного жанра (year == null),
+     * либо среди фильмов определенного жанра и года выпуска.
+     * при введении неверного года возвращается пустой список
+     * при введении неверного id жанра возвращается пустой список
+     *
+     * @param count   максимальеая длина возвращаемого списка
+     * @param genreId id жанра по которому ведется поиск
+     * @param year    год выхода фильма в прокат
+     * @return возвращает список объектов класса Film
+     */
     @Override
-    public List<Film> getPopularFilms(int count) {
-        return getFilms().stream()
-                .sorted(Comparator.comparingInt(f0 -> f0.getLikes().size() * -1))
-                .limit(count)
-                .collect(Collectors.toList());
+    public List<Film> getPopularFilmsByGenre(int count, Integer genreId, Integer year) {
+
+        String yearString;
+        String sql;
+        String genreString;
+        // создаем заготовку для запроса в БД
+        String sql1 = "SELECT f.id, " +
+                "f.name, " +
+                "f.description, " +
+                "f.release_date, " +
+                "f.duration, " +
+                "f.mpa_id, " +
+                "m.name AS mpa_name " +
+                "FROM films AS f " +
+                "LEFT JOIN mpa AS m ON f.mpa_id = m.id " +
+                "LEFT JOIN likes AS l ON f.id = l.film_id ";
+
+        String sql2 = "GROUP BY f.id " +
+                "ORDER BY COUNT(l.user_id) DESC, f.id " +
+                "LIMIT ?";
+
+        if (genreId == null) {
+            if (year == null) {
+                sql = sql1 + sql2;
+                return jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs), count);
+            } else {
+                yearString = "WHERE EXTRACT(YEAR FROM f.release_date) = ? ";
+                sql = sql1 + yearString + sql2;
+                return jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs), year, count);
+            }
+        } else {
+            if (year == null) {
+                genreString = "LEFT JOIN film_genres AS fg ON f.id = fg.film_id " +
+                        "WHERE fg.genre_id = ? ";
+                sql = sql1 + genreString + sql2;
+                return jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs), genreId, count);
+            } else {
+                genreString = "LEFT JOIN film_genres AS fg ON f.id = fg.film_id " +
+                        "WHERE fg.genre_id = ? AND EXTRACT(YEAR FROM f.release_date) = ? ";
+                sql = sql1 + genreString + sql2;
+                return jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs), genreId, year, count);
+            }
+        }
     }
 
     @Override
