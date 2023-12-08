@@ -10,6 +10,5 @@ import lombok.EqualsAndHashCode;
 public class Genre {
     @EqualsAndHashCode.Include()
     private Long id;
-
     private String name;
 }

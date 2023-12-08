@@ -8,8 +8,8 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", uses = FilmMapper.class)
 public interface FilmListMapper {
-
     List<Film> toModelList(List<FilmDto> filmDtos);
+
     List<FilmDto> toDTOList(List<Film> films);
 }
 

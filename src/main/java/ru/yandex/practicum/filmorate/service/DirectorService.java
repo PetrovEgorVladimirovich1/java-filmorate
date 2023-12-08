@@ -23,15 +23,15 @@ public class DirectorService {
         if (director.getName() == null || director.getName().isBlank()) {
             throw new ValidationException("Отсутствует имя режиссёра");
         }
-        directorStorage.createDirector(director);
-        log.info("Режиссёр успешно создан. {}", director);
-        return director;
+        Director director1 = directorStorage.createDirector(director);
+        log.info("Режиссёр успешно создан. {}", director1);
+        return director1;
     }
 
     public Director updateDirector(Director director) {
-        directorStorage.updateDirector(director);
-        log.info("Режиссёр успешно обновлён. {}", director);
-        return director;
+        Director director1 = directorStorage.updateDirector(director);
+        log.info("Режиссёр успешно обновлён. {}", director1);
+        return director1;
     }
 
     public void dellDirectorById(long id) {

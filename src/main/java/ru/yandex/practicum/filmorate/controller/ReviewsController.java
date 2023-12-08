@@ -47,7 +47,6 @@ public class ReviewsController {
         return response;
     }
 
-
     @DeleteMapping(value = "/{id}")
     public ReviewDto removeDto(@PathVariable Long id) {
         log.info("Пришел DELETE запрос /reviews с телом: {}", id);
@@ -55,7 +54,6 @@ public class ReviewsController {
         log.info("Отправлен ответ для DELETE запроса /reviews с телом: {}", response);
         return response;
     }
-
 
     @GetMapping(value = "/{id}")
     public ReviewDto getDto(@PathVariable Long id) {
@@ -73,7 +71,6 @@ public class ReviewsController {
         return response;
     }
 
-
     @PutMapping(value = "/{id}/like/{userId}")
     public Reviews addLike(@PathVariable Long id, @PathVariable Long userId) {
         log.info("Пришел PUT запрос /{}/like/{}", id, userId);
@@ -81,7 +78,6 @@ public class ReviewsController {
         log.info("Отправлен ответ для PUT запроса /{}/like/{}", id, userId);
         return response;
     }
-
 
     @PutMapping(value = "/{id}/dislike/{userId}")
     public Reviews addDislike(@PathVariable Long id, @PathVariable Long userId) {
@@ -100,7 +96,6 @@ public class ReviewsController {
         return response;
     }
 
-
     @DeleteMapping("/{id}/dislike/{userId}")
     public Reviews removeDislike(@PathVariable Long id, @PathVariable Long userId) {
         log.info("Пришел DELETE запрос /{}/dislike/{}", id, userId);
@@ -108,6 +103,4 @@ public class ReviewsController {
         log.info("Отправлен ответ для DELETE запроса /{}/dislike/{}", id, userId);
         return response;
     }
-
-
 }

@@ -367,7 +367,6 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs), userId, friendId);
     }
 
-
     private Film makeFilm(ResultSet rs) throws SQLException {
         Film film = Film.builder()
                 .id(rs.getLong("id"))
@@ -379,7 +378,6 @@ public class FilmDbStorage implements FilmStorage {
                 .build();
         Set<Genre> genres = new HashSet<>();
         for (Genre genre : getGenresForFilm(film.getId())) {
-            //film.getGenres().add(genre);
             genres.add(genre);
         }
         film.setGenres(genres);
@@ -388,7 +386,6 @@ public class FilmDbStorage implements FilmStorage {
         }
         Set<Director> directors = new HashSet<>();
         for (Director director : getDirectorByIdFilm(film.getId())) {
-           // film.getDirectors().add(director);
             directors.add(director);
         }
         film.setDirectors(directors);

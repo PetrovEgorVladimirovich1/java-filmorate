@@ -8,7 +8,6 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", uses = MpaMapper.class)
 public interface MpaListMapper {
-
     List<Mpa> toModelList(List<MpaDto> mpaDtos);
 
     List<MpaDto> toDTOList(List<Mpa> mpas);

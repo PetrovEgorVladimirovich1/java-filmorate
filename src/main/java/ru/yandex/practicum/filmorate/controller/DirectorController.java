@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.mapper.DirectorMapper;
 import ru.yandex.practicum.filmorate.service.DirectorService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController
@@ -33,7 +34,7 @@ public class DirectorController {
     }
 
     @DeleteMapping("/{id}")
-    public void dellDirectorById(@PathVariable long id) {
+    public void dellDirectorById(@NotNull @PathVariable long id) {
         directorService.dellDirectorById(id);
     }
 
@@ -44,7 +45,7 @@ public class DirectorController {
     }
 
     @GetMapping("/{id}")
-    public DirectorDto getDirectorByIdDto(@PathVariable long id) {
+    public DirectorDto getDirectorByIdDto(@NotNull @PathVariable long id) {
         return directorMapper.mapToDirectorDto(directorService.getDirectorDyId(id));
     }
 }

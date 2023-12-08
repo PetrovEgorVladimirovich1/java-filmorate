@@ -28,15 +28,11 @@ public class FilmService {
     public Film create(Film film, BindingResult bindingResult) {
         Validate.validate(bindingResult);
         return filmStorage.create(film);
-    //    log.info("Фильм успешно добавлен. {}", film);
-   //     return film;
     }
 
     public Film update(Film film, BindingResult bindingResult) {
         Validate.validate(bindingResult);
         return filmStorage.update(film);
-   //     log.info("Фильм успешно обновлён. {} {}", film, newFilm);
-   //     return newFilm;
     }
 
     public List<Film> getFilms() {

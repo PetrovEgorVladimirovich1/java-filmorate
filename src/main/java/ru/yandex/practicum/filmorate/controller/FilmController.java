@@ -29,7 +29,6 @@ public class FilmController {
     public FilmDto createDto(@Valid @RequestBody FilmDto filmDto, BindingResult bindingResult) {
 
         Film filmDto1 = filmService.create(filmMapper.mapToModel(filmDto), bindingResult);
-        log.warn("CREATE {}, {}", filmMapper.mapToModel(filmDto).getGenres(), filmDto1.getGenres());
         return filmMapper.mapToDto(filmDto1);
 
     }
@@ -38,14 +37,11 @@ public class FilmController {
     public FilmDto updateDto(@Valid @RequestBody FilmDto filmDto, BindingResult bindingResult) {
 
         Film filmDto1 = filmService.update(filmMapper.mapToModel(filmDto), bindingResult);
-        log.warn(" UPDATE {}, {}", filmMapper.mapToModel(filmDto).getGenres(), filmDto1.getGenres());
         return filmMapper.mapToDto(filmDto1);
     }
 
     @GetMapping
     public List<FilmDto> getFilmDtos() {
-      //  log.warn("khkhkhk {}  {}", filmService.getFilms().toString(), filmListMapper.toDTOList(filmService.getFilms()).toString());
-
         return filmListMapper.toDTOList(filmService.getFilms());
     }
 
@@ -56,7 +52,7 @@ public class FilmController {
 
     @GetMapping("/director/{directorId}")
     public List<FilmDto> getDirectorByLikesOrYearDto(@PathVariable("directorId") long id,
-                                               @RequestParam("sortBy") String name) {
+                                                     @RequestParam("sortBy") String name) {
         if (name.contains("year")) {
             return filmListMapper.toDTOList(filmService.getDirectorByYear(id));
         }
@@ -91,8 +87,8 @@ public class FilmController {
      */
     @GetMapping("/popular")
     public List<FilmDto> getPopularFilmsByGenreDto(@RequestParam(defaultValue = "10", required = false) int count,
-                                             @RequestParam(required = false) Integer genreId,
-                                             @RequestParam(required = false) Integer year) {
+                                                   @RequestParam(required = false) Integer genreId,
+                                                   @RequestParam(required = false) Integer year) {
 
         return filmListMapper.toDTOList(filmService.getPopularFilmsByGenre(count, genreId, year));
     }
@@ -129,7 +125,7 @@ public class FilmController {
      */
     @GetMapping("/common")
     public List<FilmDto> getCommonFilmsDto(@RequestParam int userId,
-                                     @RequestParam int friendId) {
+                                           @RequestParam int friendId) {
         return filmListMapper.toDTOList(filmService.getCommonFilm(userId, friendId));
     }
 }

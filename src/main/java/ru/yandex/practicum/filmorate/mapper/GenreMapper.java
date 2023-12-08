@@ -6,7 +6,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 
 @Mapper(componentModel = "spring")
 public interface GenreMapper {
-
     Genre mapToModel(GenreDto genreDto);
+
     GenreDto mapToDto(Genre genre);
 }

@@ -8,7 +8,6 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", uses = FeedMapper.class)
 public interface FeedListMapper {
-
     List<Feed> toModelList(List<FeedDto> feedDtos);
 
     List<FeedDto> toDTOList(List<Feed> feeds);

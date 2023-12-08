@@ -20,14 +20,12 @@ public class ReviewsService {
         this.reviewsStorage = reviewsStorage;
     }
 
-
     public Reviews create(Reviews reviews) {
         if (reviews.getUserId() <= 0 || reviews.getFilmId() <= 0) {
             throw new IncorrectParamException("id меньше нуля");
         }
         return reviewsStorage.create(reviews);
     }
-
 
     public Reviews update(Reviews reviews) {
         if (get(reviews.getReviewId()) == null) {
@@ -41,11 +39,9 @@ public class ReviewsService {
         return reviewsStorage.remove(id);
     }
 
-
     public Reviews get(Long id) {
         return reviewsStorage.get(id);
     }
-
 
     public List<Reviews> getReviewsFilm(Long id, Long count) {
         return reviewsStorage.getReviewsFilm(id, count)
@@ -55,24 +51,19 @@ public class ReviewsService {
 
     }
 
-
     public Reviews addLike(Long id, Long userId) {
         return reviewsStorage.addLike(id, userId);
     }
-
 
     public Reviews addDislike(Long id, Long userId) {
         return reviewsStorage.addDislike(id, userId);
     }
 
-
     public Reviews removeLike(Long id, Long userId) {
         return reviewsStorage.removeLike(id, userId);
     }
 
-
     public Reviews removeDislike(Long id, Long userId) {
         return reviewsStorage.removeDislike(id, userId);
     }
-
 }

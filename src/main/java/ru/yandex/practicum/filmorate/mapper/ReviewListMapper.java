@@ -8,7 +8,6 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", uses = ReviewMapper.class)
 public interface ReviewListMapper {
-
     List<Reviews> toModelList(List<ReviewDto> reviewDtos);
 
     List<ReviewDto> toDTOList(List<Reviews> reviewsList);

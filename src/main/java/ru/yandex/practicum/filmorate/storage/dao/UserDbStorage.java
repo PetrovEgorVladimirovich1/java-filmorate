@@ -30,7 +30,7 @@ public class UserDbStorage implements UserStorage {
 
 
     @Override
-    public void create(User user) {
+    public User create(User user) {
         String sql = "INSERT INTO users (email, login, name, birthday) " +
                 "VALUES (?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -43,10 +43,11 @@ public class UserDbStorage implements UserStorage {
             return stmt;
         }, keyHolder);
         user.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
+        return getByIdUser(user.getId());
     }
 
     @Override
-    public void update(User user) {
+    public User update(User user) {
         String sql = "UPDATE users " +
                 "SET email = ?, login = ?, name = ?, birthday = ? " +
                 "WHERE id = ?";
@@ -59,6 +60,7 @@ public class UserDbStorage implements UserStorage {
         if (count == 0) {
             throw new IncorrectParamException("Неверный id!");
         }
+        return getByIdUser(user.getId());
     }
 
     @Override

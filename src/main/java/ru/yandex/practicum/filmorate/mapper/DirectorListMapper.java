@@ -9,5 +9,6 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = DirectorMapper.class)
 public interface DirectorListMapper {
     List<Director> toModelList(List<DirectorDto> directorDtos);
+
     List<DirectorDto> toDTOList(List<Director> directors);
 }

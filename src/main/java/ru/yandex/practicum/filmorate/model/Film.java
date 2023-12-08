@@ -42,17 +42,9 @@ public class Film {
 
     private Set<Director> directors = new HashSet<>();
 
- /*   public Set<Long> getLikes() {
-        return likes != null ? likes : new HashSet<>();
-    }
-
-
-  */
     public Set<Genre> getGenres() {
         return genres != null ? genres : new HashSet<>();
     }
-
-
 
     public Set<Director> getDirectors() {
         return directors != null ? directors : new HashSet<>();

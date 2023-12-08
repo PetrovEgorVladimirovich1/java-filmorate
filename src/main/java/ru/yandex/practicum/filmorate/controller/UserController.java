@@ -11,9 +11,6 @@ import ru.yandex.practicum.filmorate.mapper.FeedListMapper;
 import ru.yandex.practicum.filmorate.mapper.FilmListMapper;
 import ru.yandex.practicum.filmorate.mapper.UserListMapper;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
-import ru.yandex.practicum.filmorate.model.Feed;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
