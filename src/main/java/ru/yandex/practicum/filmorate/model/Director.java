@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Genre {
+public class Director {
     @EqualsAndHashCode.Include()
     private Long id;
     private String name;
