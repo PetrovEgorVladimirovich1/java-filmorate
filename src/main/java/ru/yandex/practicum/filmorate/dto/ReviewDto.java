@@ -1,22 +1,20 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.dto;
 
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.NotNull;
 
 @Data
-@AllArgsConstructor
-@SuperBuilder
-public class Reviews {
-
+@Builder
+public class ReviewDto {
     private Long reviewId;
     @NotNull
     private String content;
     @NotNull
     private Boolean isPositive;
+    @NotNull
     private Long userId;
+    @NotNull
     private Long filmId;
     private Integer useful = 0;
 }
-

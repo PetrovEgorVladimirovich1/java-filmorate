@@ -33,17 +33,17 @@ public class UserService {
     public User create(User user, BindingResult bindingResult) {
         Validate.validate(bindingResult);
         validate(user);
-        userStorage.create(user);
-        log.info("Пользователь успешно создан. {}", user);
-        return user;
+        User newUser = userStorage.create(user);
+        log.info("Пользователь успешно создан. {}", newUser);
+        return newUser;
     }
 
     public User update(User user, BindingResult bindingResult) {
         Validate.validate(bindingResult);
         validate(user);
-        userStorage.update(user);
-        log.info("Пользователь успешно обновлён. {}", user);
-        return user;
+        User newUser = userStorage.update(user);
+        log.info("Пользователь успешно обновлён. {}", newUser);
+        return newUser;
     }
 
     public List<User> getUsers() {

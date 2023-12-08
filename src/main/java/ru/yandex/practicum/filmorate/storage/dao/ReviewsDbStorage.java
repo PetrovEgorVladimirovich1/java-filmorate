@@ -1,5 +1,3 @@
-
-
 package ru.yandex.practicum.filmorate.storage.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +15,6 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
-
 
 @Component
 public class ReviewsDbStorage implements ReviewsStorage {
@@ -131,12 +128,13 @@ public class ReviewsDbStorage implements ReviewsStorage {
         for (Integer a : useFul) {
             number += a;
         }
-        Reviews reviews = new Reviews(
-                rs.getString("content"),
-                rs.getInt("ispositive") == 1,
-                rs.getLong("filmid"),
-                rs.getLong("userid")
-        );
+        Reviews reviews = Reviews.builder()
+                .content(rs.getString("content"))
+                .isPositive(rs.getInt("ispositive") == 1)
+                .filmId(rs.getLong("filmid"))
+                .userId(rs.getLong("userid"))
+                .build();
+
         reviews.setUseful(number);
         reviews.setReviewId(rs.getLong("id"));
         return reviews;

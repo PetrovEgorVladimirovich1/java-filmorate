@@ -1,9 +1,13 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.exception.IncorrectParamException;
+import ru.yandex.practicum.filmorate.mapper.FilmListMapper;
+import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
@@ -11,44 +15,48 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
+@Slf4j
+@RequiredArgsConstructor
 @RequestMapping("/films")
 public class FilmController {
 
     private final FilmService filmService;
-
-    @Autowired
-    public FilmController(FilmService filmService) {
-        this.filmService = filmService;
-    }
+    private final FilmMapper filmMapper;
+    private final FilmListMapper filmListMapper;
 
     @PostMapping
-    public Film create(@Valid @RequestBody Film film, BindingResult bindingResult) {
-        return filmService.create(film, bindingResult);
+    public FilmDto createDto(@Valid @RequestBody FilmDto filmDto, BindingResult bindingResult) {
+
+        Film filmDto1 = filmService.create(filmMapper.mapToModel(filmDto), bindingResult);
+        return filmMapper.mapToDto(filmDto1);
+
     }
 
     @PutMapping
-    public Film update(@Valid @RequestBody Film film, BindingResult bindingResult) {
-        return filmService.update(film, bindingResult);
+    public FilmDto updateDto(@Valid @RequestBody FilmDto filmDto, BindingResult bindingResult) {
+
+        Film filmDto1 = filmService.update(filmMapper.mapToModel(filmDto), bindingResult);
+        return filmMapper.mapToDto(filmDto1);
     }
 
     @GetMapping
-    public List<Film> getFilms() {
-        return filmService.getFilms();
+    public List<FilmDto> getFilmDtos() {
+        return filmListMapper.toDTOList(filmService.getFilms());
     }
 
     @GetMapping("/{id}")
-    public Film getByIdFilm(@PathVariable long id) {
-        return filmService.getByIdFilm(id);
+    public FilmDto getByIdFilmDto(@PathVariable long id) {
+        return filmMapper.mapToDto(filmService.getByIdFilm(id));
     }
 
     @GetMapping("/director/{directorId}")
-    public List<Film> getDirectorByLikesOrYear(@PathVariable("directorId") long id,
-                                               @RequestParam("sortBy") String name) {
+    public List<FilmDto> getDirectorByLikesOrYearDto(@PathVariable("directorId") long id,
+                                                     @RequestParam("sortBy") String name) {
         if (name.contains("year")) {
-            return filmService.getDirectorByYear(id);
+            return filmListMapper.toDTOList(filmService.getDirectorByYear(id));
         }
         if (name.contains("likes")) {
-            return filmService.getDirectorByLikes(id);
+            return filmListMapper.toDTOList(filmService.getDirectorByLikes(id));
         }
         throw new IncorrectParamException("Неверный sortBy");
     }
@@ -77,10 +85,11 @@ public class FilmController {
      * @return возвращает список объектов класса Film
      */
     @GetMapping("/popular")
-    public List<Film> getPopularFilmsByGenre(@RequestParam(defaultValue = "10", required = false) int count,
-                                             @RequestParam(required = false) Integer genreId,
-                                             @RequestParam(required = false) Integer year) {
-        return filmService.getPopularFilmsByGenre(count, genreId, year);
+    public List<FilmDto> getPopularFilmsByGenreDto(@RequestParam(defaultValue = "10", required = false) int count,
+                                                   @RequestParam(required = false) Integer genreId,
+                                                   @RequestParam(required = false) Integer year) {
+
+        return filmListMapper.toDTOList(filmService.getPopularFilmsByGenre(count, genreId, year));
     }
 
 
@@ -99,10 +108,10 @@ public class FilmController {
     }
 
     @GetMapping("/search")
-    public List<Film> getFilmsBySearch(
+    public List<FilmDto> getFilmsBySearchDto(
             @RequestParam(name = "query", defaultValue = "", required = false) String query,
             @RequestParam(name = "by", defaultValue = "", required = false) String by) {
-        return filmService.getFilmsBySearch(query, by);
+        return filmListMapper.toDTOList(filmService.getFilmsBySearch(query, by));
     }
 
     /**
@@ -114,8 +123,8 @@ public class FilmController {
      * @throws IncorrectParamException если юзера с введенным id не существует
      */
     @GetMapping("/common")
-    public List<Film> getCommonFilms(@RequestParam int userId,
-                                     @RequestParam int friendId) {
-        return filmService.getCommonFilm(userId, friendId);
+    public List<FilmDto> getCommonFilmsDto(@RequestParam int userId,
+                                           @RequestParam int friendId) {
+        return filmListMapper.toDTOList(filmService.getCommonFilm(userId, friendId));
     }
 }
