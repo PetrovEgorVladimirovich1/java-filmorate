@@ -38,4 +38,6 @@ public class Film {
     private final Set<Genre> genres = new HashSet<>();
 
     private final Set<Long> likes = new HashSet<>();
+
+    private final Set<Director> directors = new HashSet<>();
 }

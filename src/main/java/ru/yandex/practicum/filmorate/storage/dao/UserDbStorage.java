@@ -98,8 +98,13 @@ public class UserDbStorage implements UserStorage {
         }
     }
 
+    /**
+     * @throws IncorrectParamException если юзер с введенныи id отсутствует
+     */
     @Override
     public List<User> getUserFriends(long id) {
+        //проверяем, существует ли пользователь в нужным id
+        getByIdUser(id);
         String sql = "SELECT * FROM users WHERE id IN (SELECT friend_id FROM friends WHERE user_id = ?)";
         return jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs), id);
     }
@@ -110,6 +115,25 @@ public class UserDbStorage implements UserStorage {
         List<User> friendsOtherUser = getUserFriends(idOtherUser);
         friendsUser.retainAll(friendsOtherUser);
         return friendsUser;
+    }
+
+    /**
+     * метод для удаления записи о фильме из таблицы users.
+     * предполагается, что данные из связанных таблиц БД удалит каскадом
+     * т.е. при создании новых таблиц связанных с таблицей films надо указывать -
+     * "REFERENCES users (id) ON DELETE CASCADE"
+     *
+     * @param userId id экземпляра класса Film
+     * @throws IncorrectParamException при отсутствии элемента с данным id
+     */
+    @Override
+    public void deleteUser(Integer userId) {
+        String sql = "DELETE FROM users " +
+                "WHERE id = ?";
+        int count = jdbcTemplate.update(sql, userId);
+        if (count == 0) {
+            throw new IncorrectParamException("Невереный id!");
+        }
     }
 
     private User makeUser(ResultSet rs) throws SQLException {

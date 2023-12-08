@@ -75,6 +75,7 @@ class FilmDbStorageTest {
                 LocalDate.of(2000, 9, 19));
         userDbStorage.create(userTest);
         filmDbStorage.addLike(film.getId(), userTest.getId());
+        System.out.println();
         assertEquals(1, filmDbStorage.getPopularFilms(5).size());
     }
 
