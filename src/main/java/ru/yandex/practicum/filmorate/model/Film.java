@@ -12,6 +12,7 @@ import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 @Data
 @AllArgsConstructor
@@ -35,9 +36,26 @@ public class Film {
 
     private Mpa mpa;
 
-    private final Set<Genre> genres = new HashSet<>();
+    private Set<Genre> genres = new HashSet<>();
 
-    private final Set<Long> likes = new HashSet<>();
+    private final Set<Long> likes = new TreeSet<>();
 
-    private final Set<Director> directors = new HashSet<>();
+    private Set<Director> directors = new HashSet<>();
+
+ /*   public Set<Long> getLikes() {
+        return likes != null ? likes : new HashSet<>();
+    }
+
+
+  */
+    public Set<Genre> getGenres() {
+        return genres != null ? genres : new HashSet<>();
+    }
+
+
+
+    public Set<Director> getDirectors() {
+        return directors != null ? directors : new HashSet<>();
+    }
+
 }

@@ -32,7 +32,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public void create(Film film) {
+    public Film create(Film film) {
         String sql = "INSERT INTO films (name, description, release_date, duration, mpa_id) " +
                 "VALUES (?, ?, ?, ?, ?)";
         String sqlForFilmGenres = "INSERT INTO film_genres (film_id, genre_id) " +
@@ -60,10 +60,11 @@ public class FilmDbStorage implements FilmStorage {
                     director.getId(),
                     film.getId());
         }
+        return getByIdFilm(film.getId());
     }
 
     @Override
-    public void update(Film film) {
+    public Film update(Film film) {
         String sql = "UPDATE films " +
                 "SET name = ?, description = ?, release_date = ?, duration = ?, mpa_id = ? " +
                 "WHERE id = ?";
@@ -95,6 +96,7 @@ public class FilmDbStorage implements FilmStorage {
                     director.getId(),
                     film.getId());
         }
+        return getByIdFilm(film.getId());
     }
 
     @Override
@@ -236,7 +238,7 @@ public class FilmDbStorage implements FilmStorage {
                 .collect(Collectors.toList());
     }
 
-    public Set<Film> getFilmsByDirectorId(long id) {
+    public List<Film> getFilmsByDirectorId(long id) {
         String sql = "SELECT f.id, f.name, f.description, f.release_date, f.duration, " +
                 "f.mpa_id, m.name AS mpa_name " +
                 "FROM directors AS d " +
@@ -246,7 +248,7 @@ public class FilmDbStorage implements FilmStorage {
                 "      ON f.id = fd.film_id " +
                 "LEFT JOIN mpa AS m ON f.mpa_id = m.id " +
                 "WHERE director_id = ?";
-        return new HashSet<>(jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs), id));
+        return new ArrayList<>(jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs), id));
     }
 
     public Set<Director> getDirectorByIdFilm(long filmId) {
@@ -375,24 +377,30 @@ public class FilmDbStorage implements FilmStorage {
                 .duration(rs.getInt("duration"))
                 .mpa(new Mpa(rs.getLong("mpa_id"), rs.getString("mpa_name")))
                 .build();
+        Set<Genre> genres = new HashSet<>();
         for (Genre genre : getGenresForFilm(film.getId())) {
-            film.getGenres().add(genre);
+            //film.getGenres().add(genre);
+            genres.add(genre);
         }
+        film.setGenres(genres);
         for (Long like : getLikesForFilm(film.getId())) {
             film.getLikes().add(like);
         }
+        Set<Director> directors = new HashSet<>();
         for (Director director : getDirectorByIdFilm(film.getId())) {
-            film.getDirectors().add(director);
+           // film.getDirectors().add(director);
+            directors.add(director);
         }
+        film.setDirectors(directors);
         return film;
     }
 
-    private Set<Genre> getGenresForFilm(long filmId) {
+    private List<Genre> getGenresForFilm(long filmId) {
         String sql = "SELECT fg.genre_id, g.name " +
                 "FROM film_genres AS fg " +
                 "LEFT JOIN genres AS g ON fg.genre_id = g.id " +
                 "WHERE FILM_ID = ?";
-        return new HashSet<>(jdbcTemplate.query(sql, (rs, rowNum) -> makeGenre(rs), filmId));
+        return new ArrayList<>(jdbcTemplate.query(sql, (rs, rowNum) -> makeGenre(rs), filmId));
     }
 
     private Genre makeGenre(ResultSet rs) throws SQLException {

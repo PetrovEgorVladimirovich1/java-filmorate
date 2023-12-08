@@ -131,12 +131,22 @@ public class ReviewsDbStorage implements ReviewsStorage {
         for (Integer a : useFul) {
             number += a;
         }
+        /*
         Reviews reviews = new Reviews(
                 rs.getString("content"),
                 rs.getInt("ispositive") == 1,
                 rs.getLong("filmid"),
                 rs.getLong("userid")
         );
+        .id(rs.getLong("id"))
+         */
+        Reviews reviews = Reviews.builder()
+                .content(rs.getString("content"))
+                .isPositive(rs.getInt("ispositive") == 1)
+                .filmId(rs.getLong("filmid"))
+                .userId(rs.getLong("userid"))
+                .build();
+
         reviews.setUseful(number);
         reviews.setReviewId(rs.getLong("id"));
         return reviews;
