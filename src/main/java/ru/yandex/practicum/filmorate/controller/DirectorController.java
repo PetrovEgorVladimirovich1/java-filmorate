@@ -2,30 +2,36 @@ package ru.yandex.practicum.filmorate.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.dto.DirectorDto;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.service.DirectorService;
+import ru.yandex.practicum.filmorate.utils.MappingUtils;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController
 @RequestMapping("/directors")
 public class DirectorController {
     private final DirectorService directorService;
+    private final MappingUtils mappingUtils;
+
 
     @Autowired
-    public DirectorController(DirectorService directorService) {
+    public DirectorController(DirectorService directorService, MappingUtils mappingUtils) {
         this.directorService = directorService;
+        this.mappingUtils = mappingUtils;
     }
 
     @PostMapping
-    public Director createDirector(@Valid @RequestBody Director director) {
-        return directorService.createDirector(director);
+    public DirectorDto createDirector(@RequestBody DirectorDto director) {
+        return mappingUtils.mapToDirectorDto(directorService
+                .createDirector(mappingUtils.mapToDirector(director)));
     }
 
     @PutMapping
-    public Director updateDirector(@Valid @RequestBody Director director) {
-        return directorService.updateDirector(director);
+    public DirectorDto updateDirector(@RequestBody DirectorDto director) {
+        return mappingUtils.mapToDirectorDto(directorService
+                .updateDirector(mappingUtils.mapToDirector(director)));
     }
 
     @DeleteMapping("/{id}")
@@ -34,12 +40,13 @@ public class DirectorController {
     }
 
     @GetMapping
-    public List<Director> getDirectors() {
-        return directorService.getDirectors();
+    public List<DirectorDto> getDirectors() {
+        List<Director> directors = directorService.getDirectors();
+        return mappingUtils.convertList(directors, mappingUtils::mapToDirectorDto);
     }
 
     @GetMapping("/{id}")
-    public Director getDirectorById(@PathVariable long id) {
-        return directorService.getDirectorDyId(id);
+    public DirectorDto getDirectorById(@PathVariable long id) {
+        return mappingUtils.mapToDirectorDto(directorService.getDirectorDyId(id));
     }
 }

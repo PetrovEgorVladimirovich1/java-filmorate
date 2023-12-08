@@ -25,7 +25,7 @@ public class DirectorDbStorage implements DirectorStorage {
     }
 
     @Override
-    public void createDirector(Director director) {
+    public Director createDirector(Director director) {
         String sql = "INSERT INTO directors (name) VALUES (?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
@@ -34,10 +34,11 @@ public class DirectorDbStorage implements DirectorStorage {
             return stmt;
         }, keyHolder);
         director.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
+        return director;
     }
 
     @Override
-    public void updateDirector(Director director) {
+    public Director updateDirector(Director director) {
         String sql = "UPDATE directors SET name = ? WHERE id = ?";
         int count = jdbcTemplate.update(sql,
                 director.getName(),
@@ -45,6 +46,7 @@ public class DirectorDbStorage implements DirectorStorage {
         if (count == 0) {
             throw new IncorrectParamException("Неверный id!");
         }
+        return director;
     }
 
     @Override

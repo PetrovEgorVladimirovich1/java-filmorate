@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +44,7 @@ public class FilmController {
 
     @GetMapping("/director/{directorId}")
     public List<Film> getDirectorByLikesOrYear(@PathVariable("directorId") long id,
-                                               @RequestParam("sortBy") String name) {
+                                               @RequestParam("sortBy") @NonNull String name) {
         if (name.contains("year")) {
             return filmService.getDirectorByYear(id);
         }

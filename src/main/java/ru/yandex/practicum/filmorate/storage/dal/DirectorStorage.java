@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface DirectorStorage {
 
-    void createDirector(Director director);
+    Director createDirector(Director director);
 
-    void updateDirector(Director director);
+    Director updateDirector(Director director);
 
     void dellDirectorById(long id);
 
