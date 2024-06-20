@@ -6,6 +6,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.IncorrectParamException;
+import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.dal.UserStorage;
 
@@ -13,6 +14,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
@@ -28,7 +30,7 @@ public class UserDbStorage implements UserStorage {
 
 
     @Override
-    public void create(User user) {
+    public User create(User user) {
         String sql = "INSERT INTO users (email, login, name, birthday) " +
                 "VALUES (?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -41,10 +43,11 @@ public class UserDbStorage implements UserStorage {
             return stmt;
         }, keyHolder);
         user.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
+        return getByIdUser(user.getId());
     }
 
     @Override
-    public void update(User user) {
+    public User update(User user) {
         String sql = "UPDATE users " +
                 "SET email = ?, login = ?, name = ?, birthday = ? " +
                 "WHERE id = ?";
@@ -57,6 +60,7 @@ public class UserDbStorage implements UserStorage {
         if (count == 0) {
             throw new IncorrectParamException("Неверный id!");
         }
+        return getByIdUser(user.getId());
     }
 
     @Override
@@ -82,24 +86,35 @@ public class UserDbStorage implements UserStorage {
         }
         String sql = "INSERT INTO friends (user_id, friend_id) " +
                 "VALUES (?, ?)";
+        String sqlFeed = "INSERT INTO feeds (user_id, entity_id, event_type, operation, times) " +
+                "VALUES (?, ?, 'FRIEND', 'ADD', ?)";
         int count = jdbcTemplate.update(sql, idUser, idFriend);
         if (count == 0) {
             throw new IncorrectParamException("Неверный id!");
         }
+        jdbcTemplate.update(sqlFeed, idUser, idFriend, Instant.now());
     }
 
     @Override
     public void deleteFriend(long idUser, long idFriend) {
         String sql = "DELETE FROM friends " +
                 "WHERE user_id = ? AND friend_id = ?";
+        String sqlFeed = "INSERT INTO feeds (user_id, entity_id, event_type, operation, times) " +
+                "VALUES (?, ?, 'FRIEND', 'REMOVE', ?)";
         int count = jdbcTemplate.update(sql, idUser, idFriend);
         if (count == 0) {
             throw new IncorrectParamException("Неверный id!");
         }
+        jdbcTemplate.update(sqlFeed, idUser, idFriend, Instant.now());
     }
 
+    /**
+     * @throws IncorrectParamException если юзер с введенныи id отсутствует
+     */
     @Override
     public List<User> getUserFriends(long id) {
+        //проверяем, существует ли пользователь в нужным id
+        getByIdUser(id);
         String sql = "SELECT * FROM users WHERE id IN (SELECT friend_id FROM friends WHERE user_id = ?)";
         return jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs), id);
     }
@@ -112,11 +127,46 @@ public class UserDbStorage implements UserStorage {
         return friendsUser;
     }
 
+    @Override
+    public List<Feed> getFeeds(long id) {
+        getByIdUser(id);
+        String sql = "SELECT * FROM feeds WHERE user_id = ?";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> makeFeed(rs), id);
+    }
+
+    /**
+     * метод для удаления записи о фильме из таблицы users.
+     * предполагается, что данные из связанных таблиц БД удалит каскадом
+     * т.е. при создании новых таблиц связанных с таблицей films надо указывать -
+     * "REFERENCES users (id) ON DELETE CASCADE"
+     *
+     * @param userId id экземпляра класса Film
+     * @throws IncorrectParamException при отсутствии элемента с данным id
+     */
+    @Override
+    public void deleteUser(Integer userId) {
+        String sql = "DELETE FROM users " +
+                "WHERE id = ?";
+        int count = jdbcTemplate.update(sql, userId);
+        if (count == 0) {
+            throw new IncorrectParamException("Неверный id!");
+        }
+    }
+
     private User makeUser(ResultSet rs) throws SQLException {
         return new User(rs.getLong("id"),
                 rs.getString("email"),
                 rs.getString("login"),
                 rs.getString("name"),
                 rs.getDate("birthday").toLocalDate());
+    }
+
+    private Feed makeFeed(ResultSet rs) throws SQLException {
+        return new Feed(rs.getLong("event_id"),
+                rs.getLong("user_id"),
+                rs.getLong("entity_id"),
+                rs.getString("event_type"),
+                rs.getString("operation"),
+                rs.getTimestamp("times").getTime());
     }
 }
